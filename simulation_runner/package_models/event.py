@@ -1,11 +1,10 @@
 from datetime import datetime
-from simulation_manager import SimulationManager
 
 
 class Event:
     _id_counter = 1  # class-level variable to keep track of IDs
 
-    def __init__(self, simulation_manager: SimulationManager):
+    def __init__(self, simulation_manager):
         self.id = Event._id_counter
         Event._id_counter += 1
         self.time: datetime = None

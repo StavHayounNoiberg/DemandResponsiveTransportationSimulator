@@ -1,14 +1,12 @@
-from models.bus import Bus
-from models.stop import Stop
-from line_manager import LineManager
+from .bus import Bus
 
 
 class ExpressBus(Bus):
-    def __init__(self, line_manager: LineManager):
-        super().__init__(line_manager)
-        self.pending_stops: list[Stop] = []
+    def __init__(self):
+        super().__init__()
+        self.pending_stops: list["Stop"] = []
 
-    def add_stop(self, stop: Stop) -> bool:
+    def add_stop(self, stop: "Stop") -> bool:
         try:
             self.pending_stops.append(stop)
             return True
@@ -23,3 +21,6 @@ class ExpressBus(Bus):
         except Exception as e:
             print(e)
             return False
+
+
+from .stop import Stop

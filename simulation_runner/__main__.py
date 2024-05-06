@@ -1,8 +1,7 @@
 from datetime import datetime
-from models.simulation import Simulation
-from simulation_manager import SimulationManager
+from ..models.simulation import Simulation
+from .simulation_manager import SimulationManager
 import sys
-
 
 if __name__ == "__main__":
     # Get parameters sent from the command line (simulation_id, line_id, start_time, end_time, express_rate, reporting_rate, line_id)
@@ -11,8 +10,8 @@ if __name__ == "__main__":
         if len(sys.argv) >= 6:
             simulation_id = sys.argv[1]
             line_id = sys.argv[2]
-            start_time = datetime.strptime(sys.argv[3], "%d-%m-%Y %H:%M")
-            end_time = datetime.strptime(sys.argv[4], "%d-%m-%Y %H:%M")
+            start_time = datetime.strptime(sys.argv[3], "%d-%m-%Y.%H:%M")
+            end_time = datetime.strptime(sys.argv[4], "%d-%m-%Y.%H:%M")
             express_rate = float(sys.argv[5])
             reporting_rate = float(sys.argv[6])
 

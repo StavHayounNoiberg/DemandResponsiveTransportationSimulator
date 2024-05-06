@@ -1,6 +1,5 @@
 from datetime import datetime
-from models.assignment_reason import AssignmentReason
-from models.bus import Bus
+from .assignment_reason import AssignmentReason
 
 
 class Passenger:
@@ -21,10 +20,10 @@ class Passenger:
         self.leaving_time = leaving_time
         self.aboard_time: datetime = None
         self.arrival_time: datetime = None
-        self.bus: Bus = None
+        self.bus = None
         self.assignment_reason: AssignmentReason = None
 
-    def update_bus(self, bus: Bus, assignment_reason) -> bool:
+    def update_bus(self, bus, assignment_reason) -> bool:
         try:
             self.bus = bus
             self.assignment_reason = assignment_reason

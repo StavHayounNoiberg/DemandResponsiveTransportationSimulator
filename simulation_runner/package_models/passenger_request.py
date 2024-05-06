@@ -1,12 +1,11 @@
 from datetime import datetime
-from event import Event
-from simulation_manager import SimulationManager
+from .event import Event
 
 
 class PassengerRequest(Event):
     def __init__(
         self,
-        simulation_manager: SimulationManager,
+        simulation_manager: "SimulationManager",
         line_id: str,
         stop_src: str,
         stop_dest: str,
@@ -23,3 +22,6 @@ class PassengerRequest(Event):
     def handle(self) -> bool:
         # TODO: implement handler
         pass
+
+
+from ..simulation_manager import SimulationManager

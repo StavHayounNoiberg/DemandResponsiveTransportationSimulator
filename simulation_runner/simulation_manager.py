@@ -1,18 +1,17 @@
 from datetime import datetime, timedelta
 import heapq
-from line_manager import LineManager
-from models.event import Event
-from models.passenger import Passenger
-from models.simulation import Simulation
 from random import choices
-from route_manager import RouteManager
+from ..models.simulation import Simulation
+from .package_models.event import Event
+from .route_manager import RouteManager
+from .line_manager import LineManager
 
 
 class SimulationManager:
     def __init__(self, simulation: Simulation):
         self.simulation = simulation
         self.queue: list[Event] = []
-        self.passengers: list[Passenger] = []
+        self.passengers = []
         self.route_manager = RouteManager(simulation)
         self.line_manager = LineManager(simulation)
 

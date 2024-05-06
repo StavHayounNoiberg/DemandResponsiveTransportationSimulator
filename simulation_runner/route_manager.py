@@ -1,7 +1,7 @@
 from datetime import datetime
-from models.bus import Bus
-from models.simulation import Simulation
-from models.stop import Stop
+from ..models.simulation import Simulation
+from .package_models.bus import Bus
+from .package_models.stop import Stop
 
 
 class RouteManager:

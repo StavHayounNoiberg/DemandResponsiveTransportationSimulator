@@ -1,4 +1,3 @@
-from datetime import datetime
 import multiprocessing
 import subprocess
 import sys
@@ -8,10 +7,10 @@ import uuid
 def main():
     # Get parameters sent from the command line (start_time, end_time, express_rate, reporting_rate, line_ids)
     if len(sys.argv) >= 6:
-        start_time = datetime.strptime(sys.argv[1], "%d-%m-%Y %H:%M")
-        end_time = datetime.strptime(sys.argv[2], "%d-%m-%Y %H:%M")
-        express_rate = float(sys.argv[3])
-        reporting_rate = float(sys.argv[4])
+        start_time = sys.argv[1]
+        end_time = sys.argv[2]
+        express_rate = sys.argv[3]
+        reporting_rate = sys.argv[4]
         ids_list = sys.argv[5:]
     else:
         start_time, end_time, express_rate, reporting_rate, ids_list = get_user_input()
@@ -20,10 +19,11 @@ def main():
     processes_and_ids = []
     for line_id in ids_list:
         simulation_id = create_simulation_id()
+        print(f"Starting simulation {simulation_id} for line {line_id}")
         simulation_command = [
             "python",
             "-m",
-            "simulation_runner",
+            "FinalProjectSimulator.simulation_runner",
             simulation_id,
             line_id,
             start_time,
@@ -49,7 +49,7 @@ def main():
         analyzer_command = [
             "python",
             "-m",
-            "simulation_analyzer",
+            "FinalProjectSimulator.simulation_analyzer",
             id,
         ]
         process = multiprocessing.Process(
@@ -64,14 +64,10 @@ def main():
 
 
 def get_user_input():
-    start_str = input("Enter the start datetime (format: YYYY-MM-DD HH:MM): ")
-    start_datetime = datetime.strptime(start_str, "%d-%m-%Y %H:%M")
-
-    end_str = input("Enter the end datetime (format: YYYY-MM-DD HH:MM): ")
-    end_datetime = datetime.strptime(end_str, "%d-%m-%Y %H:%M")
-
-    express_rate = float(input("Enter the express rate: "))
-    reporting_rate = float(input("Enter the reporting rate: "))
+    start_datetime = input("Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
+    end_datetime = input("Enter the end datetime (format: DD-MM-YYYY.HH:MM): ")
+    express_rate = input("Enter the express rate: ")
+    reporting_rate = input("Enter the reporting rate: ")
     ids_str = input("Enter the list of IDs separated by commas: ")
     ids_list = ids_str.split(",")
     return start_datetime, end_datetime, express_rate, reporting_rate, ids_list
