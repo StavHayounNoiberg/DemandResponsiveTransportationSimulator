@@ -1,10 +1,14 @@
 from datetime import datetime, timedelta
 import heapq
+import logging
 from random import choices
 from ..models.simulation import Simulation
 from .package_models.event import Event
 from .route_manager import RouteManager
 from .line_manager import LineManager
+
+
+logger = logging.getLogger(__name__)
 
 
 class SimulationManager:
@@ -16,6 +20,8 @@ class SimulationManager:
         self.line_manager = LineManager(simulation)
 
     def create_events(self) -> list[Event]:
+        logger.debug("started")
+        logger.info("Creating simulation events")
         try:
             self.route_manager.create_stops()
             self.line_manager.create_buses()
@@ -24,13 +30,23 @@ class SimulationManager:
             for bus in self.line_manager.buses:
                 self.queue.append(bus.create_events())
 
-            # TODO: create all passengers events
+            # call create_passengers_events and append events to the queue
+            self.queue.append(self.__create_passengers_events())
 
+            # turn the queue into a heap
             heapq.heapify(self.queue)
+            logger.debug("finished")
             return self.queue
         except Exception as e:
-            print(e)
+            logger.error(e)
             return []
+
+    def __create_passengers_events(self) -> list[Event]:
+        logger.debug("started")
+        logger.info("Creating passengers events")
+
+        logger.debug("finished")
+        return []
 
     def peek_next_event(self) -> Event:
         if not self.queue:
@@ -47,18 +63,22 @@ class SimulationManager:
             heapq.heappush(self.queue, event)
             return True
         except TypeError:
-            print("Event must be an instance of the Event class")
+            logger.error("Event must be an instance of the Event class")
             return False
         except Exception as e:
-            print(e)
+            logger.error(e)
             return False
 
     def save_results(self) -> bool:
+        logger.debug("started")
+        logger.info("Saving simulation results")
         # TODO: save_results should save all passengers and buses data to database
 
         self.simulation.set_duration()
         self.simulation.set_success(True)
         # TODO: save simulation to database
+
+        logger.debug("finished")
         pass
 
     # def create_events(

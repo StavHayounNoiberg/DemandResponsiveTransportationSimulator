@@ -1,7 +1,16 @@
 from datetime import datetime
+from .logging_config import setup_logging
 from ..models.simulation import Simulation
 from .simulation_manager import SimulationManager
 import sys
+
+
+# Set up logging
+setup_logging(log_level=logging.DEBUG)
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 if __name__ == "__main__":
     # Get parameters sent from the command line (simulation_id, line_id, start_time, end_time, express_rate, reporting_rate, line_id)
@@ -28,6 +37,7 @@ if __name__ == "__main__":
             manager = SimulationManager(simulation)
             manager.create_events()
 
+            logger.info("Simulation started")
             # Iterate over the events and handle them
             while manager.peek_next_event() is not None:
                 event = manager.pop_next_event()
@@ -35,12 +45,15 @@ if __name__ == "__main__":
 
             # Save the simulation results
             if manager.save_results() is True:
+                logger.info("Simulation finished successfully")
                 sys.exit(0)
             else:
+                logger.info("Simulation finished with errors")
+                logger.error("Error saving simulation results")
                 sys.exit(1)
         else:
-            print("Error: Missing parameters")
+            logger.error("Missing parameters")
             sys.exit(1)
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         sys.exit(1)

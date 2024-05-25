@@ -1,4 +1,8 @@
+import logging
 from .event import Event
+
+
+logger = logging.getLogger(__name__)
 
 
 class BusStart(Event):
@@ -7,7 +11,11 @@ class BusStart(Event):
         self.bus = bus
 
     def handle(self) -> bool:
+        logger.debug("started")
+        logger.info("Handling BusStart event for bus %d", self.bus.id)
         # TODO: implement handler
+
+        logger.debug("finished")
         pass
 
 

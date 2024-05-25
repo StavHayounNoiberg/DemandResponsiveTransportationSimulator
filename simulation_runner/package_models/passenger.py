@@ -1,5 +1,9 @@
 from datetime import datetime
+import logging
 from .assignment_reason import AssignmentReason
+
+
+logger = logging.getLogger(__name__)
 
 
 class Passenger:
@@ -24,26 +28,35 @@ class Passenger:
         self.assignment_reason: AssignmentReason = None
 
     def update_bus(self, bus, assignment_reason) -> bool:
+        logger.debug("started")
+        logger.info("Updating bus for passenger %d", self.id)
         try:
             self.bus = bus
             self.assignment_reason = assignment_reason
+            logger.debug("finished")
             return True
         except Exception as e:
-            print(e)
+            logger.error(e)
             return False
 
     def update_aboard(self, time: datetime) -> bool:
+        logger.debug("started")
+        logger.info("Updating aboard time for passenger %d", self.id)
         try:
             self.aboard_time = time
+            logger.debug("finished")
             return True
         except Exception as e:
-            print(e)
+            logger.error(e)
             return False
 
     def update_arrival(self, time: datetime) -> bool:
+        logger.debug("started")
+        logger.info("Updating arrival time for passenger %d", self.id)
         try:
             self.arrival_time = time
+            logger.debug("finished")
             return True
         except Exception as e:
-            print(e)
+            logger.error(e)
             return False

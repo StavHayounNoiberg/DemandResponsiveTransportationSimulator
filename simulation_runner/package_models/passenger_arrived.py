@@ -1,5 +1,9 @@
+import logging
 from .event import Event
 from .passenger import Passenger
+
+
+logger = logging.getLogger(__name__)
 
 
 class PassengerArrived(Event):
@@ -8,7 +12,13 @@ class PassengerArrived(Event):
         self.passenger = passenger
 
     def handle(self) -> bool:
+        logger.debug("started")
+        logger.info(
+            "Handling PassengerArrived event for passenger %d", self.passenger.id
+        )
         # TODO: implement handler
+
+        logger.debug("finished")
         pass
 
 

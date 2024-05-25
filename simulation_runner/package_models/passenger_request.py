@@ -1,5 +1,9 @@
 from datetime import datetime
+import logging
 from .event import Event
+
+
+logger = logging.getLogger(__name__)
 
 
 class PassengerRequest(Event):
@@ -20,7 +24,13 @@ class PassengerRequest(Event):
         self.leaving_time = leaving_time
 
     def handle(self) -> bool:
+        logger.debug("started")
+        logger.info(
+            "Handling PassengerRequest event for passenger %d", self.passenger.id
+        )
         # TODO: implement handler
+
+        logger.debug("finished")
         pass
 
 
