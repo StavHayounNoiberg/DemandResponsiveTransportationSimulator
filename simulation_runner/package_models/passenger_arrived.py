@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from .event import Event
 from .passenger import Passenger
@@ -7,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class PassengerArrived(Event):
-    def __init__(self, simulation_manager: "SimulationManager", passenger: Passenger):
-        super().__init__(simulation_manager)
+    def __init__(self, simulation_manager: "SimulationManager", time: datetime, passenger: Passenger):
+        super().__init__(simulation_manager, time)
         self.passenger = passenger
 
     def handle(self) -> bool:

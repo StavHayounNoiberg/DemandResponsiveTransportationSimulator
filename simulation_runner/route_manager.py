@@ -18,8 +18,10 @@ class RouteManager:
         logger.info("Creating stops")
         # TODO: Create all the stops for the line
 
+        stops = [Stop]
+        stops.sort(key=lambda x: x.ordinal_number)
         logger.debug("finished")
-        pass
+        return stops
 
     def create_route(self, bus: Bus) -> list[tuple[Stop, datetime]]:
         logger.debug("started")

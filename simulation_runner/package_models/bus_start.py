@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from .event import Event
 
@@ -6,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 class BusStart(Event):
-    def __init__(self, simulation_manager: "SimulationManager", bus: "Bus"):
+    def __init__(self, simulation_manager: "SimulationManager", time: datetime, bus: "Bus"):
         super().__init__(simulation_manager)
         self.bus = bus
 

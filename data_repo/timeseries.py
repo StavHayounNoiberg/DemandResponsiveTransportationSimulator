@@ -1,10 +1,15 @@
+import logging
+import pandas as pd
 from FinalProjectSimulator.models.simulation import Simulation
 from db_pool import get_timeseries_con
 
 
+logger = logging.getLogger(__name__)
+
+
 def fetch_timeseries_data_by_primary_key(
     simulation: Simulation, day: int, data_type: str
-) -> list | None:
+) -> pd.DataFrame | None:
     try:
         line_parts = simulation.line_id.split("-")
         line_id = line_parts[0]
@@ -12,13 +17,11 @@ def fetch_timeseries_data_by_primary_key(
         day = map_days(day)
         data_type = map_data_type(data_type)
         conn = get_timeseries_con()
-        with conn.cursor() as cursor:
-            sql_query = f"SELECT * FROM `{line_id}` WHERE `קו` = %s AND `סוג יום` = %s AND ` חתך` = %s"
-            cursor.execute(sql_query, (extended_line_id, day, data_type))
-            result = cursor.fetchall()
-            return result
+        sql_query = f"SELECT * FROM `{line_id}` WHERE `קו` = `{extended_line_id}` AND `סוג יום` = `{day}` AND ` חתך` = `{data_type}`"
+        df = pd.read_sql(sql_query, conn)
+        return df
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(e)
     finally:
         if conn.is_connected():
             conn.close()
