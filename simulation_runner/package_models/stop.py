@@ -57,5 +57,5 @@ class Stop:
             return False
 
 
-from .bus import Bus
-from .passenger import Passenger
+from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
+from FinalProjectSimulator.simulation_runner.package_models.passenger import Passenger

@@ -1,6 +1,6 @@
 from datetime import datetime
-from .event import Event
 import logging
+from FinalProjectSimulator.simulation_runner.package_models.event import Event
 
 
 logger = logging.getLogger(__name__)
@@ -27,6 +27,6 @@ class BusAtStop(Event):
         pass
 
 
-from .bus import Bus
-from .stop import Stop
-from ..simulation_manager import SimulationManager
+from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
+from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
+from FinalProjectSimulator.simulation_runner.simulation_manager import SimulationManager

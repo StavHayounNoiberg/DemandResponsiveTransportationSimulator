@@ -21,7 +21,7 @@ def main():
         simulation_id = create_simulation_id()
         print(f"Starting simulation {simulation_id} for line {line_id}")
         simulation_command = [
-            "python",
+            sys.executable,
             "-m",
             "FinalProjectSimulator.simulation_runner",
             simulation_id,
@@ -47,7 +47,7 @@ def main():
     for pair in processes_and_ids:
         id = pair[1]
         analyzer_command = [
-            "python",
+            sys.executable,
             "-m",
             "FinalProjectSimulator.simulation_analyzer",
             id,
@@ -64,6 +64,8 @@ def main():
 
 
 def get_user_input():
+    # TODO: Delete this hard coded parameters
+    return "28-05-2024.12:30", "28-05-2024.14:00", "0.3", "0.8", ["10010-3-#"] 
     start_datetime = input("Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
     end_datetime = input("Enter the end datetime (format: DD-MM-YYYY.HH:MM): ")
     express_rate = input("Enter the express rate: ")

@@ -1,5 +1,5 @@
 import logging
-from .bus import Bus
+from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
 
 
 logger = logging.getLogger(__name__)
@@ -33,4 +33,4 @@ class ExpressBus(Bus):
             return False
 
 
-from .stop import Stop
+from FinalProjectSimulator.simulation_runner.package_models.stop import Stop

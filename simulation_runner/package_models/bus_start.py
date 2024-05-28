@@ -1,6 +1,6 @@
 from datetime import datetime
 import logging
-from .event import Event
+from FinalProjectSimulator.simulation_runner.package_models.event import Event
 
 
 logger = logging.getLogger(__name__)
@@ -20,5 +20,5 @@ class BusStart(Event):
         pass
 
 
-from .bus import Bus
-from ..simulation_manager import SimulationManager
+from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
+from FinalProjectSimulator.simulation_runner.simulation_manager import SimulationManager

@@ -1,6 +1,6 @@
 from datetime import datetime
 import logging
-from .event import Event
+from FinalProjectSimulator.simulation_runner.package_models.event import Event
 
 
 logger = logging.getLogger(__name__)
@@ -78,5 +78,5 @@ class Bus:
         pass
 
 
-from .passenger import Passenger
-from .stop import Stop
+from FinalProjectSimulator.simulation_runner.package_models.passenger import Passenger
+from FinalProjectSimulator.simulation_runner.package_models.stop import Stop

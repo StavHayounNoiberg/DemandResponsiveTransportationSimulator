@@ -1,9 +1,12 @@
 import configparser
 import mysql.connector
+import os
 
 
 config = configparser.ConfigParser()
-config.read("db_config.ini")
+root_dir = os.path.dirname(os.path.abspath(__file__))
+config_file = os.path.join(root_dir, 'db_config.ini')
+config.read(config_file)
 
 gtfs_dbconfig = {
     "user": config["mysql"]["user"],

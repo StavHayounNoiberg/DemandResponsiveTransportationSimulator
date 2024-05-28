@@ -9,7 +9,7 @@ def setup_logging(log_dir: str = 'logs', log_level: int = logging.INFO):
     logger = logging.getLogger()
     logger.setLevel(log_level)
     
-    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    current_time = datetime.now().strftime("%Y%m%d-%H%M")
     file_name = f"{current_time}.log"
 
     c_handler = logging.StreamHandler()

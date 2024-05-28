@@ -1,7 +1,7 @@
 import logging
-from ..models.simulation import Simulation
-from .package_models.bus import Bus
-from .package_models.stop import Stop
+from FinalProjectSimulator.models.simulation import Simulation
+from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
+from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
 
 
 logger = logging.getLogger(__name__)

@@ -1,6 +1,6 @@
 from datetime import datetime
-from .event import Event
 import logging
+from FinalProjectSimulator.simulation_runner.package_models.event import Event
 
 
 logger = logging.getLogger(__name__)
@@ -35,4 +35,4 @@ class PassengerRequest(Event):
         pass
 
 
-from ..simulation_manager import SimulationManager
+from FinalProjectSimulator.simulation_runner.simulation_manager import SimulationManager

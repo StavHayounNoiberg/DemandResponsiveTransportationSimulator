@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
+from FinalProjectSimulator.data_repo.db_pool import get_timeseries_con
 from FinalProjectSimulator.models.simulation import Simulation
-from db_pool import get_timeseries_con
 
 
 logger = logging.getLogger(__name__)
@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 def fetch_timeseries_data_by_primary_key(
     simulation: Simulation, day: int, data_type: str
 ) -> pd.DataFrame | None:
+    conn = get_timeseries_con()
     try:
         line_parts = simulation.line_id.split("-")
         line_id = line_parts[0]
         extended_line_id = "-".join(line_parts[:2])
         day = map_days(day)
         data_type = map_data_type(data_type)
-        conn = get_timeseries_con()
-        sql_query = f"SELECT * FROM `{line_id}` WHERE `קו` = `{extended_line_id}` AND `סוג יום` = `{day}` AND ` חתך` = `{data_type}`"
+        sql_query = f"SELECT * FROM `{line_id}` WHERE `קו` = '{extended_line_id}' AND `סוג יום` = '{day}' AND ` חתך` = '{data_type}'"
         df = pd.read_sql(sql_query, conn)
         return df
     except Exception as e:

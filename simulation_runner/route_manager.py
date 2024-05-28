@@ -1,8 +1,8 @@
 from datetime import datetime
 import logging
-from ..models.simulation import Simulation
-from .package_models.bus import Bus
-from .package_models.stop import Stop
+from FinalProjectSimulator.models.simulation import Simulation
+from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
+from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
 
 
 logger = logging.getLogger(__name__)
@@ -19,7 +19,8 @@ class RouteManager:
         # TODO: Create all the stops for the line
 
         stops = [Stop]
-        stops.sort(key=lambda x: x.ordinal_number)
+        #TODO: enable after implementing the Stop class
+        #stops.sort(key=lambda x: x.ordinal_number)
         logger.debug("finished")
         return stops
 

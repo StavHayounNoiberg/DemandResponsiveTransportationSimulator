@@ -2,15 +2,13 @@ from datetime import datetime, timedelta
 import heapq
 import logging
 import numpy as np
-import pandas as pd
-from ..data_repo.timeseries import fetch_timeseries_data_by_primary_key
-from ..data_repo.ridership import fetch_stations_passengers_by_day
-from .line_manager import LineManager
-from ..models.simulation import Simulation
-from .package_models.event import Event
-from .package_models.passenger_request import PassengerRequest
-from .route_manager import RouteManager
-from ..utilities.distributions import create_datetimes_poisson_distribution
+from FinalProjectSimulator.data_repo.timeseries import fetch_timeseries_data_by_primary_key
+from FinalProjectSimulator.data_repo.ridership import fetch_stations_passengers_by_day
+from FinalProjectSimulator.models.simulation import Simulation
+from FinalProjectSimulator.simulation_runner.line_manager import LineManager
+from FinalProjectSimulator.simulation_runner.package_models.event import Event
+from FinalProjectSimulator.simulation_runner.route_manager import RouteManager
+from FinalProjectSimulator.utilities.distributions import create_datetimes_poisson_distribution
 
 
 logger = logging.getLogger(__name__)
@@ -77,9 +75,9 @@ class SimulationManager:
         # TODO: save simulation to database
 
         logger.debug("finished")
-        pass
-
-    def __create_passengers_events(self) -> list[PassengerRequest]:
+        return True
+    
+    def __create_passengers_events(self) -> list["PassengerRequest"]:
         logger.debug("started")
         logger.info("Creating passengers events")
         line_id = self.simulation.line_id
@@ -108,14 +106,14 @@ class SimulationManager:
         day_numbers = [(dt.weekday() + 1) % 7 + 1 for dt in date_list]
 
         # Create the list of datetimes for the passengers events
-        datetimes = [datetime]
+        datetimes: list[datetime] = []
         for i in range(len(date_list) - 1):
             start_date = date_list[i]
             end_date = date_list[i + 1]
             day_number = day_numbers[i]
 
             timeseries_data = fetch_timeseries_data_by_primary_key(
-                line_id, day_number, "passengers"
+                self.simulation, day_number, "passengers"
             )
 
             # Create poisson distribution of events for each hour in the day based on the timeseries data
@@ -128,7 +126,7 @@ class SimulationManager:
 
         # Create the probabilities for each station based on the ridership data
         ridership_dfs = {
-            day: fetch_stations_passengers_by_day(line_id, day)
+            day: fetch_stations_passengers_by_day(self.simulation, day)
             for day in set(day_numbers)
         }
 
@@ -139,7 +137,7 @@ class SimulationManager:
             probabilities[day] = prob
 
         # Create the passenger events
-        events = [PassengerRequest]
+        events: list[PassengerRequest] = []
         for leave_time in datetimes:
             day = (leave_time.weekday() + 1) % 7 + 1
             prob = probabilities[day]
@@ -173,6 +171,9 @@ class SimulationManager:
 
         logger.debug("finished")
         return events
+    
+    
+from FinalProjectSimulator.simulation_runner.package_models.passenger_request import PassengerRequest
 
     # def create_events(
     #     self,

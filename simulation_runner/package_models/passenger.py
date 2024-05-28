@@ -1,6 +1,6 @@
 from datetime import datetime
 import logging
-from .assignment_reason import AssignmentReason
+from FinalProjectSimulator.simulation_runner.package_models.assignment_reason import AssignmentReason
 
 
 logger = logging.getLogger(__name__)

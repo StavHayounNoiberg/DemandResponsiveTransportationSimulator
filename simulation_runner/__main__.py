@@ -1,12 +1,15 @@
 from datetime import datetime
-from .logging_config import setup_logging
-from ..models.simulation import Simulation
-from .simulation_manager import SimulationManager
+import os
 import sys
+from FinalProjectSimulator.models.simulation import Simulation
+from FinalProjectSimulator.simulation_runner.logging_config import setup_logging
+from FinalProjectSimulator.simulation_runner.simulation_manager import SimulationManager
 
 
 # Set up logging
-setup_logging(log_level=logging.DEBUG)
+root_dir = os.path.dirname(os.path.abspath(__file__))
+log_dir = os.path.join(root_dir, 'logs')
+setup_logging(log_dir, log_level=10) # DEBUG level (10)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -45,15 +48,10 @@ if __name__ == "__main__":
 
             # Save the simulation results
             if manager.save_results() is True:
-                logger.info("Simulation finished successfully")
-                sys.exit(0)
+                logger.info("Simulation results saved successfully")
             else:
-                logger.info("Simulation finished with errors")
-                logger.error("Error saving simulation results")
-                sys.exit(1)
+                logger.error("Simulation results were not saved successfully")
         else:
             logger.error("Missing parameters")
-            sys.exit(1)
     except Exception as e:
-        logger.error(f"Error: {e}")
-        sys.exit(1)
+        logger.error(e)
