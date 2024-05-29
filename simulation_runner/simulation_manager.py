@@ -2,17 +2,13 @@ from datetime import datetime, timedelta
 import heapq
 import logging
 import numpy as np
-from FinalProjectSimulator.data_repo.timeseries import (
-    fetch_timeseries_data_by_primary_key,
-)
+from FinalProjectSimulator.data_repo.timeseries import fetch_timeseries_data_by_primary_key
 from FinalProjectSimulator.data_repo.ridership import fetch_stations_passengers_by_day
 from FinalProjectSimulator.models.simulation import Simulation
 from FinalProjectSimulator.simulation_runner.line_manager import LineManager
 from FinalProjectSimulator.simulation_runner.package_models.event import Event
 from FinalProjectSimulator.simulation_runner.route_manager import RouteManager
-from FinalProjectSimulator.utilities.distributions import (
-    create_datetimes_poisson_distribution,
-)
+from FinalProjectSimulator.utilities.distributions import create_datetimes_poisson_distribution
 
 
 logger = logging.getLogger(__name__)
