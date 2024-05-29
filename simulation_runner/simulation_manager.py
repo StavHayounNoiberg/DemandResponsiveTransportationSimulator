@@ -111,7 +111,7 @@ class SimulationManager:
             day_number = day_numbers[i]
 
             timeseries_data = fetch_timeseries_data_by_primary_key(
-                self.simulation, day_number, "passengers"
+                self.simulation.line_id, day_number, "passengers"
             )
 
             # Create poisson distribution of events for each hour in the day based on the timeseries data

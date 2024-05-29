@@ -1,18 +1,15 @@
 import logging
 import pandas as pd
 from FinalProjectSimulator.data_repo.db_pool import get_timeseries_con
-from FinalProjectSimulator.models.simulation import Simulation
 
 
 logger = logging.getLogger(__name__)
 
 
-def fetch_timeseries_data_by_primary_key(
-    simulation: Simulation, day: int, data_type: str
-) -> pd.DataFrame | None:
+def fetch_timeseries_data_by_primary_key(full_line_id: str, day: int, data_type: str) -> pd.DataFrame | None:
     conn = get_timeseries_con()
     try:
-        line_parts = simulation.line_id.split("-")
+        line_parts = full_line_id.split("-")
         line_id = line_parts[0]
         extended_line_id = "-".join(line_parts[:2])
         day = map_days(day)
