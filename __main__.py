@@ -65,7 +65,7 @@ def main():
 
 def get_user_input():
     # TODO: Delete this hard coded parameters
-    return "28-05-2024.12:30", "28-05-2024.14:00", "0.3", "0.8", ["10010-3-#"] 
+    return "28-05-2024.12:30", "29-05-2024.14:00", "0.3", "0.8", ["10010-3-#"] 
     start_datetime = input("Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
     end_datetime = input("Enter the end datetime (format: DD-MM-YYYY.HH:MM): ")
     express_rate = input("Enter the express rate: ")

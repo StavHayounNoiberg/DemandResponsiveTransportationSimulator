@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging
+from FinalProjectSimulator.data_repo.ridership import fetch_all_stations
 from FinalProjectSimulator.models.simulation import Simulation
 from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
@@ -16,13 +17,13 @@ class RouteManager:
     def create_stops(self) -> list[Stop]:
         logger.debug("started")
         logger.info("Creating stops")
-        # TODO: Create all the stops for the line
-
-        stops = [Stop]
-        #TODO: enable after implementing the Stop class
-        #stops.sort(key=lambda x: x.ordinal_number)
+        ridership_df = fetch_all_stations(self.simulation.line_id)
+        for index, row in ridership_df.iterrows():
+            stop = Stop(row["תחנה"], row["סידורי תחנה"], row["שם תחנה"])
+            self.stops.append(stop)
+        self.stops.sort(key=lambda x: x.ordinal_number)
         logger.debug("finished")
-        return stops
+        return self.stops
 
     def create_route(self, bus: Bus) -> list[tuple[Stop, datetime]]:
         logger.debug("started")

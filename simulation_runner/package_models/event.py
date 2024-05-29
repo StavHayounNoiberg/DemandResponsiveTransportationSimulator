@@ -16,7 +16,7 @@ class Event:
 
     def __lt__(self, other) -> bool:
         if isinstance(other, Event):
-            return self.get_time() < other.get_time()
+            return self.time < other.time
         return NotImplemented
 
     def handle(self) -> bool:

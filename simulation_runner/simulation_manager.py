@@ -93,9 +93,7 @@ class SimulationManager:
         ) + timedelta(days=1)
 
         # Add midnights until the day before the end_time
-        while current_date < end_time.replace(
-            hour=0, minute=0, second=0, microsecond=0
-        ):
+        while current_date < end_time:
             date_list.append(current_date)
             current_date += timedelta(days=1)
 
@@ -126,7 +124,7 @@ class SimulationManager:
 
         # Create the probabilities for each station based on the ridership data
         ridership_dfs = {
-            day: fetch_stations_passengers_by_day(self.simulation, day)
+            day: fetch_stations_passengers_by_day(self.simulation.line_id, day)
             for day in set(day_numbers)
         }
 
@@ -141,13 +139,16 @@ class SimulationManager:
         for leave_time in datetimes:
             day = (leave_time.weekday() + 1) % 7 + 1
             prob = probabilities[day]
-            stops = self.route_manager.stops[:-1]
-            src_station = np.random.choice(stops, p=prob[:-1])
+            stops = self.route_manager.stops
+            src_station = np.random.choice(stops, p=prob)
             optional_dsts = [
                 stop
                 for stop in self.route_manager.stops
                 if stop.ordinal_number > src_station.ordinal_number
             ]
+            if not optional_dsts:
+                logger.warning("No optional destinations for station %s, probably it is the last stop", src_station.name)
+                continue
             dst_station = np.random.choice(optional_dsts)
             is_reporting = np.random.choice(
                 [True, False],
