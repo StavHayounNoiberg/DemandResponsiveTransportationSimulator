@@ -1,85 +1,49 @@
 import configparser
-import mysql.connector
 import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 config = configparser.ConfigParser()
 root_dir = os.path.dirname(os.path.abspath(__file__))
-config_file = os.path.join(root_dir, 'db_config.ini')
+config_file = os.path.join(root_dir, "db_config.ini")
 config.read(config_file)
 
-gtfs_dbconfig = {
-    "user": config["mysql"]["user"],
-    "password": config["mysql"]["password"],
-    "host": config["mysql"]["host"],
-    "database": "GTFS",
-    "charset": config["mysql"]["charset"],
-}
 
-timeseries_dbconfig = {
-    "user": config["mysql"]["user"],
-    "password": config["mysql"]["password"],
-    "host": config["mysql"]["host"],
-    "database": "GTFS_Timeseries",
-    "charset": config["mysql"]["charset"],
-}
+def create_engine_from_config(config_section, database):
+    return create_engine(
+        f"mysql+mysqldb://{config_section['user']}:{config_section['password']}@{config_section['host']}/{database}?charset={config_section['charset']}",
+        pool_size=5,
+        max_overflow=10,
+        pool_timeout=30,
+        pool_recycle=1800,
+    )
 
-ridership_dbconfig = {
-    "user": config["mysql"]["user"],
-    "password": config["mysql"]["password"],
-    "host": config["mysql"]["host"],
-    "database": "GTFS_Ridership",
-    "charset": config["mysql"]["charset"],
-}
 
-analyzedLines_dbconfig = {
-    "user": config["mysql"]["user"],
-    "password": config["mysql"]["password"],
-    "host": config["mysql"]["host"],
-    "database": "AnalyzedLines",
-    "charset": config["mysql"]["charset"],
-}
+gtfs_engine = create_engine_from_config(config["mysql"], "GTFS")
+timeseries_engine = create_engine_from_config(config["mysql"], "GTFS_Timeseries")
+ridership_engine = create_engine_from_config(config["mysql"], "GTFS_Ridership")
+analyzedLines_engine = create_engine_from_config(config["mysql"], "AnalyzedLines")
+# simulation_engine = create_engine_from_config(config["mysql"], "SimulationResults")
 
-simulation_dbconfig = {
-    "user": config["mysql"]["user"],
-    "password": config["mysql"]["password"],
-    "host": config["mysql"]["host"],
-    "database": "simulation",
-    "charset": config["mysql"]["charset"],
-}
-
-gtfs_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="gtfs_pool", **gtfs_dbconfig
-)
-timeseries_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="timeseries_pool", **timeseries_dbconfig
-)
-ridership_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="ridership_pool", **ridership_dbconfig
-)
-analyzedLines_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="analyzedLines_pool", **analyzedLines_dbconfig
-)
-# simulation_pool = mysql.connector.pooling.MySQLConnectionPool(
-#     pool_name="simulation_pool", **simulation_dbconfig
-# )
+# Simulation_Session = sessionmaker(bind=simulation_engine)
 
 
 def get_gtfs_con():
-    return gtfs_pool.get_connection()
+    return gtfs_engine.connect()
 
 
 def get_timeseries_con():
-    return timeseries_pool.get_connection()
+    return timeseries_engine.connect()
 
 
 def get_ridership_con():
-    return ridership_pool.get_connection()
+    return ridership_engine.connect()
 
 
 def get_analyzedLines_con():
-    return analyzedLines_pool.get_connection()
+    return analyzedLines_engine.connect()
 
 
 # def get_simulation_con():
-#     return simulation_pool.get_connection()
+#     return simulation_engine.connect()

@@ -6,47 +6,27 @@ from FinalProjectSimulator.data_repo.db_pool import get_ridership_con
 logger = logging.getLogger(__name__)
 
 
-def fetch_ridership_data_by_primary_key(line_id: str, station_id: str) -> list | None:
-    conn = get_ridership_con()
-    try:
-        station = int(station_id)
-        with conn.cursor() as cursor:
-            sql_query = f"SELECT * FROM `{line_id}` WHERE `תחנה` = %s"
-            cursor.execute(sql_query, (station,))
-            result = cursor.fetchall()
-            return result
-    except Exception as e:
-        logger.error(e)
-    finally:
-        if conn.is_connected():
-            conn.close()
-
-
 def fetch_stations_passengers_by_day(line_id: str, day: int) -> pd.DataFrame | None:
-    conn = get_ridership_con()
     try:
-        day = map_days(day)
-        sql_query = f"SELECT `תחנה`, `שם תחנה`, `סידורי תחנה`, `{day}` FROM `{line_id}` ORDER BY `סידורי תחנה`"
-        df = pd.read_sql(sql_query, conn)
-        return df
+        day_mapped = map_days(day)
+        sql_query = f"SELECT `תחנה`, `שם תחנה`, `סידורי תחנה`, `{day_mapped}` FROM `{line_id}` ORDER BY `סידורי תחנה`"
+        with get_ridership_con() as conn:
+            df = pd.read_sql(sql_query, conn)
+            return df
     except Exception as e:
         logger.error(e)
-    finally:
-        if conn.is_connected():
-            conn.close()
+        return None
 
 
 def fetch_all_stations(line_id: str) -> pd.DataFrame | None:
-    conn = get_ridership_con()
     try:
         sql_query = f"SELECT `תחנה`, `שם תחנה`, `סידורי תחנה` FROM `{line_id}` ORDER BY `סידורי תחנה`"
-        df = pd.read_sql(sql_query, conn)
-        return df
+        with get_ridership_con() as conn:
+            df = pd.read_sql(sql_query, conn)
+            return df
     except Exception as e:
         logger.error(e)
-    finally:
-        if conn.is_connected():
-            conn.close()
+        return None
 
 
 def map_days(day: int) -> str:
