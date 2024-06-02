@@ -21,7 +21,7 @@ class RouteManager:
         logger.debug("started")
         logger.info("Creating stops")
         ridership_df = get_all_stations(self.simulation.line_id)
-        for _, row in ridership_df.iterrows(index=False):
+        for _, row in ridership_df.iterrows():
             stop_location = get_stop_location(row["תחנה"])
             stop = Stop(row["תחנה"], row["סידורי תחנה"],
                         row["שם תחנה"], stop_location)

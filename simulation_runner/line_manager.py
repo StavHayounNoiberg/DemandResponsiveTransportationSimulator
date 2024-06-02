@@ -24,7 +24,7 @@ class LineManager:
             self.simulation.start_time, self.simulation.end_time)
         day_numbers = [get_day_number(dt) for dt in date_list]
 
-        for i in range(day_numbers):
+        for i in range(len(day_numbers)):
             gtfs_data = get_trip_ids_and_departure_times(
                 self.simulation.line_id, day_numbers[i])
             for trip_id, departure_time in gtfs_data.itertuples(index=False):
@@ -51,7 +51,7 @@ class LineManager:
         logger.debug("finished")
         return self.buses
 
-    def find_next_express_bus(self, stop: Stop, desired_time: datetime) -> "Bus" | None:
+    def find_next_express_bus(self, stop: Stop, desired_time: datetime) -> "Bus":
         logger.debug("started")
         logger.info("Finding next express bus for stop %d", stop.id)
 

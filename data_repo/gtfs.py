@@ -8,10 +8,11 @@ logger = logging.getLogger(__name__)
 
 def get_stop_codes_and_arrival_times(trip_id: str) -> pd.DataFrame | None:
     try:
-        sql_query = f"SELECT stops.stop_code, stopTimes.arrival_time
+        sql_query = f'''SELECT stops.stop_code, stopTimes.arrival_time
         FROM stopTimes
         JOIN stops ON stopTimes.stop_id = stops.stop_id
-        WHERE SUBSTRING_INDEX(stopTimes.trip_id, '_', 1) = '{trip_id}'"
+        WHERE SUBSTRING_INDEX(stopTimes.trip_id, '_', 1) = '{trip_id}'
+        '''
         with get_gtfs_con() as conn:
             df = pd.read_sql(sql_query, conn)
             return df
@@ -22,7 +23,7 @@ def get_stop_codes_and_arrival_times(trip_id: str) -> pd.DataFrame | None:
 
 def get_stop_location(stop_code: str) -> tuple[float, float] | None:
     try:
-        sql_query = f"SELECT stop_lat, stop_lon FROM stops WHERE stop_code = '{stop_code}'"
+        sql_query = f"SELECT stop_lat, stop_lon FROM stops WHERE stop_code = {stop_code}"
         with get_gtfs_con() as conn:
             df = pd.read_sql(sql_query, conn)
             num_rows = df.shape[0]
