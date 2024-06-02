@@ -6,10 +6,11 @@ logger = logging.getLogger(__name__)
 
 
 class Stop:
-    def __init__(self, stop_id: str, ordinal_number: int, name: str):
+    def __init__(self, stop_id: str, ordinal_number: int, name: str, location: tuple[float, float]):
         self.id = stop_id
         self.ordinal_number = ordinal_number
         self.name = name
+        self.location = location
         self.buses: list[tuple["Bus", datetime]] = []
         self.passengers: list["Passenger"] = []
 

@@ -1,6 +1,8 @@
 from datetime import datetime
 import logging
-from FinalProjectSimulator.simulation_runner.package_models.assignment_reason import AssignmentReason
+from FinalProjectSimulator.simulation_runner.package_models.assignment_reason import (
+    AssignmentReason,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -11,8 +13,8 @@ class Passenger:
 
     def __init__(
         self,
-        stop_src: str,
-        stop_dest: str,
+        stop_src: "Stop",
+        stop_dest: "Stop",
         reporting_time: datetime,
         leaving_time: datetime,
     ):
@@ -60,3 +62,6 @@ class Passenger:
         except Exception as e:
             logger.error(e)
             return False
+
+
+from FinalProjectSimulator.simulation_runner.package_models.stop import Stop

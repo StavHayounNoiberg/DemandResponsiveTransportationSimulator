@@ -26,12 +26,12 @@ def create_datetimes_poisson_distribution(
 
         num_events = np.random.poisson(hour_lambda)
         inter_arrival_times = np.random.exponential(
-            scale=1 / hour_lambda, size=num_events
-        )
+            scale=1 / hour_lambda, size=num_events)
 
         current_event_time = current_hour
         for inter_arrival_time in inter_arrival_times:
-            event_time = current_event_time + timedelta(hours=inter_arrival_time)
+            event_time = current_event_time + \
+                timedelta(hours=inter_arrival_time)
             if event_time > next_hour:
                 break
             datetimes.append(event_time.replace(microsecond=0))

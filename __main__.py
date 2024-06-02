@@ -32,8 +32,7 @@ def main():
             reporting_rate,
         ]
         process = multiprocessing.Process(
-            target=subprocess.run, args=(simulation_command,)
-        )
+            target=subprocess.run, args=(simulation_command,))
         processes_and_ids.append((process, simulation_id))
         process.start()
 
@@ -53,8 +52,7 @@ def main():
             id,
         ]
         process = multiprocessing.Process(
-            target=subprocess.run, args=(analyzer_command,)
-        )
+            target=subprocess.run, args=(analyzer_command,))
         analyzer_processes.append(process)
         process.start()
 
@@ -65,8 +63,9 @@ def main():
 
 def get_user_input():
     # TODO: Delete this hard coded parameters
-    return "28-05-2024.12:30", "29-05-2024.14:00", "0.3", "0.8", ["10010-3-#"] 
-    start_datetime = input("Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
+    return "28-05-2024.12:30", "29-05-2024.14:00", "0.3", "0.8", ["10010-3-#"]
+    start_datetime = input(
+        "Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
     end_datetime = input("Enter the end datetime (format: DD-MM-YYYY.HH:MM): ")
     express_rate = input("Enter the express rate: ")
     reporting_rate = input("Enter the reporting rate: ")

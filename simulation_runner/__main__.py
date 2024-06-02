@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 import os
 import sys
@@ -9,8 +10,7 @@ from FinalProjectSimulator.simulation_runner.simulation_manager import Simulatio
 # Set up logging
 root_dir = os.path.dirname(os.path.abspath(__file__))
 log_dir = os.path.join(root_dir, 'logs')
-setup_logging(log_dir, log_level=10) # DEBUG level (10)
-import logging
+setup_logging(log_dir, log_level=10)  # DEBUG level (10)
 
 logger = logging.getLogger(__name__)
 

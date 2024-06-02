@@ -65,11 +65,11 @@ class SimulationManager:
         except Exception as e:
             logger.error(e)
             return False
-        
+
     def add_passenger(self, passenger) -> bool:
         self.passengers.append(passenger)
         return True
-    
+
     def save_results(self) -> bool:
         logger.debug("started")
         logger.info("Saving simulation results")
@@ -88,7 +88,7 @@ class SimulationManager:
         line_id = self.simulation.line_id
         start_time = self.simulation.start_time
         end_time = self.simulation.end_time
-        
+
         date_list = get_datetimes_between(start_time, end_time)
 
         # Create the list of day numbers (1 for Sunday, 2 for Monday, ..., 7 for Saturday)
@@ -102,23 +102,16 @@ class SimulationManager:
             day_number = day_numbers[i]
 
             timeseries_data = get_timeseries_data_by_primary_key(
-                self.simulation.line_id, day_number, "passengers"
-            )
+                self.simulation.line_id, day_number, "passengers")
 
             # Create poisson distribution of events for each hour in the day based on the timeseries data
             lambda_params = timeseries_data.iloc[0, 3:].tolist()
-            datetimes.extend(
-                create_datetimes_poisson_distribution(
-                    lambda_params, start_date, end_date
-                )
-            )
+            datetimes.extend(create_datetimes_poisson_distribution(
+                lambda_params, start_date, end_date))
 
         # Create the probabilities for each station based on the ridership data
-        ridership_dfs = {
-            day: get_stations_passengers_by_day(self.simulation.line_id, day)
-            for day in set(day_numbers)
-        }
-
+        ridership_dfs = {day: get_stations_passengers_by_day(
+            self.simulation.line_id, day) for day in set(day_numbers)}
         probabilities = {}
         for day, df in ridership_dfs.items():
             daily_averages = df[df.columns[-1]]
@@ -133,36 +126,19 @@ class SimulationManager:
             stops = self.route_manager.stops
             src_station = np.random.choice(stops, p=prob)
             optional_dsts = [
-                stop
-                for stop in self.route_manager.stops
-                if stop.ordinal_number > src_station.ordinal_number
-            ]
+                stop for stop in self.route_manager.stops if stop.ordinal_number > src_station.ordinal_number]
             if not optional_dsts:
                 logger.warning(
-                    "No optional destinations for station %s, probably it is the last stop",
-                    src_station.name,
-                )
+                    "No optional destinations for station %s, probably it is the last stop", src_station.name)
                 continue
             dst_station = np.random.choice(optional_dsts)
-            is_reporting = np.random.choice(
-                [True, False],
-                p=[self.simulation.reporting_rate, 1 - self.simulation.reporting_rate],
-            )
+            is_reporting = np.random.choice([True, False], p=[
+                                            self.simulation.reporting_rate, 1 - self.simulation.reporting_rate])
             # TODO: implement reporting time logic
-            report_time = (
-                leave_time - timedelta(hours=1) if is_reporting else leave_time
-            )
-            events.append(
-                PassengerRequest(
-                    self,
-                    report_time,
-                    line_id,
-                    src_station,
-                    dst_station,
-                    is_reporting,
-                    leave_time,
-                )
-            )
+            report_time = (leave_time - timedelta(hours=1)
+                           if is_reporting else leave_time)
+            events.append(PassengerRequest(self, report_time, line_id,
+                          src_station, dst_station, is_reporting, leave_time))
 
         logger.debug("finished")
         return events

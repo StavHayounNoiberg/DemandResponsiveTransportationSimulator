@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class ExpressBus(Bus):
     def __init__(self, id: int, line_manager, leave_time: datetime):
         super().__init__(id, line_manager, leave_time)
-        self.pending_stops: list["Stop"] = []
+        self.pending_stops: list[tuple["Stop", datetime, bool]] = []
 
     def add_stop(self, stop: "Stop") -> bool:
         logger.debug("started")

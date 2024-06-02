@@ -3,7 +3,6 @@ import logging
 from FinalProjectSimulator.simulation_runner.package_models.event import Event
 
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -22,11 +21,14 @@ class Bus:
     def create_events(self) -> list[Event]:
         logger.debug("started")
         logger.info("Creating events for bus %d", self.id)
-        # TODO: 1. Create 'BusStart' event at time of departure
-        # 2. If bus has a route defined (it is ordinary bus) create 'BusAtStop' event and 'BusFinish' after last stop
-
+        events_list = [
+            BusStart(self.line_manager.simulation_manager, self.leave_time, self)]
+        events_list.append(BusAtStop(self.line_manager.simulation_manager,
+                           stop[1], self, stop[0]) for stop in self.route)
+        # TODO: decide if to use BusFinish event
+        # events_list.append(BusFinish(self.line_manager.simulation_manager, self.route[-1][1], self))
         logger.debug("finished")
-        pass
+        return events_list
 
     def add_passenger(self, passenger: "Passenger") -> bool:
         logger.debug("started")

@@ -15,8 +15,7 @@ def get_datetimes_between(start_date: datetime, end_date: datetime) -> list[date
     date_list = [start_date]
     # Calculate the next midnight after the start_time
     current_date = start_date.replace(
-        hour=0, minute=0, second=0, microsecond=0
-    ) + timedelta(days=1)
+        hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
 
     # Add midnights until the day before the end_time
     while current_date < end_date:
