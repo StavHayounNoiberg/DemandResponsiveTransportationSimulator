@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class BusAtStop(Event):
     def __init__(
-        self, simulation_manager: "SimulationManager", time: datetime, bus: "Bus", stop: "Stop"
+        self, simulation_manager, time: datetime, bus: "Bus", stop: "Stop"
     ):
         super().__init__(simulation_manager, time)
         self.bus = bus
@@ -29,4 +29,3 @@ class BusAtStop(Event):
 
 from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
-from FinalProjectSimulator.simulation_runner.simulation_manager import SimulationManager

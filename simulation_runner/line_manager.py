@@ -1,14 +1,17 @@
 import logging
+import numpy as np
+from FinalProjectSimulator.data_repo.gtfs import get_trip_ids_and_departure_times
 from FinalProjectSimulator.models.simulation import Simulation
-from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
+from FinalProjectSimulator.utilities.datetime_utils import get_day_number, get_datetimes_between
 
 
 logger = logging.getLogger(__name__)
 
 
 class LineManager:
-    def __init__(self, simulation: Simulation):
+    def __init__(self, simulation_manager, simulation: Simulation):
+        self.simulation_manager = simulation_manager
         self.simulation = simulation
         self.buses: list["Bus"] = []
 
@@ -22,10 +25,14 @@ class LineManager:
         logger.debug("finished")
         pass
 
-    def find_next_express_bus(self, stop: Stop) -> Bus:
+    def find_next_express_bus(self, stop: Stop) -> "Bus":
         logger.debug("started")
         logger.info("Finding next express bus for stop %d", stop.id)
         # TODO: Implement this method
 
         logger.debug("finished")
         pass
+
+
+from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
+from FinalProjectSimulator.simulation_runner.package_models.express_bus import ExpressBus

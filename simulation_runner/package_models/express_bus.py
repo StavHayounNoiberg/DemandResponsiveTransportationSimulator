@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
 
@@ -6,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 class ExpressBus(Bus):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, id: int, line_manager, leave_time: datetime):
+        super().__init__(id, line_manager, leave_time)
         self.pending_stops: list["Stop"] = []
 
     def add_stop(self, stop: "Stop") -> bool:

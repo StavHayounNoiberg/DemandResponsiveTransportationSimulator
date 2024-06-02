@@ -1,9 +1,11 @@
 from datetime import datetime
 import logging
-from FinalProjectSimulator.data_repo.ridership import fetch_all_stations
+from FinalProjectSimulator.data_repo.gtfs import get_trip_ids_and_departure_times, get_stop_codes_and_arrival_times
+from FinalProjectSimulator.data_repo.ridership import get_all_stations
 from FinalProjectSimulator.models.simulation import Simulation
 from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
+from FinalProjectSimulator.utilities.datetime_utils import get_day_number
 
 
 logger = logging.getLogger(__name__)
@@ -17,7 +19,8 @@ class RouteManager:
     def create_stops(self) -> list[Stop]:
         logger.debug("started")
         logger.info("Creating stops")
-        ridership_df = fetch_all_stations(self.simulation.line_id)
+        ridership_df = get_all_stations(self.simulation.line_id)
+        # TODO: add station coordinates to the Stop object        
         for index, row in ridership_df.iterrows():
             stop = Stop(row["תחנה"], row["סידורי תחנה"], row["שם תחנה"])
             self.stops.append(stop)

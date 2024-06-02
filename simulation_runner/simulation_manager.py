@@ -2,12 +2,13 @@ from datetime import datetime, timedelta
 import heapq
 import logging
 import numpy as np
-from FinalProjectSimulator.data_repo.timeseries import fetch_timeseries_data_by_primary_key
-from FinalProjectSimulator.data_repo.ridership import fetch_stations_passengers_by_day
+from FinalProjectSimulator.data_repo.timeseries import get_timeseries_data_by_primary_key
+from FinalProjectSimulator.data_repo.ridership import get_stations_passengers_by_day
 from FinalProjectSimulator.models.simulation import Simulation
 from FinalProjectSimulator.simulation_runner.line_manager import LineManager
 from FinalProjectSimulator.simulation_runner.package_models.event import Event
 from FinalProjectSimulator.simulation_runner.route_manager import RouteManager
+from FinalProjectSimulator.utilities.datetime_utils import get_day_number, get_datetimes_between
 from FinalProjectSimulator.utilities.distributions import create_datetimes_poisson_distribution
 
 
@@ -20,7 +21,7 @@ class SimulationManager:
         self.queue: list[Event] = []
         self.passengers = []
         self.route_manager = RouteManager(simulation)
-        self.line_manager = LineManager(simulation)
+        self.line_manager = LineManager(self, simulation)
 
     def create_events(self) -> list[Event]:
         logger.debug("started")
@@ -64,7 +65,11 @@ class SimulationManager:
         except Exception as e:
             logger.error(e)
             return False
-
+        
+    def add_passenger(self, passenger) -> bool:
+        self.passengers.append(passenger)
+        return True
+    
     def save_results(self) -> bool:
         logger.debug("started")
         logger.info("Saving simulation results")
@@ -83,25 +88,11 @@ class SimulationManager:
         line_id = self.simulation.line_id
         start_time = self.simulation.start_time
         end_time = self.simulation.end_time
-
-        # Initialize the list with the start_time
-        date_list = [start_time]
-
-        # Calculate the next midnight after the start_time
-        current_date = start_time.replace(
-            hour=0, minute=0, second=0, microsecond=0
-        ) + timedelta(days=1)
-
-        # Add midnights until the day before the end_time
-        while current_date < end_time:
-            date_list.append(current_date)
-            current_date += timedelta(days=1)
-
-        # Add the end_time
-        date_list.append(end_time)
+        
+        date_list = get_datetimes_between(start_time, end_time)
 
         # Create the list of day numbers (1 for Sunday, 2 for Monday, ..., 7 for Saturday)
-        day_numbers = [(dt.weekday() + 1) % 7 + 1 for dt in date_list]
+        day_numbers = [get_day_number(dt) for dt in date_list]
 
         # Create the list of datetimes for the passengers events
         datetimes: list[datetime] = []
@@ -110,7 +101,7 @@ class SimulationManager:
             end_date = date_list[i + 1]
             day_number = day_numbers[i]
 
-            timeseries_data = fetch_timeseries_data_by_primary_key(
+            timeseries_data = get_timeseries_data_by_primary_key(
                 self.simulation.line_id, day_number, "passengers"
             )
 
@@ -124,7 +115,7 @@ class SimulationManager:
 
         # Create the probabilities for each station based on the ridership data
         ridership_dfs = {
-            day: fetch_stations_passengers_by_day(self.simulation.line_id, day)
+            day: get_stations_passengers_by_day(self.simulation.line_id, day)
             for day in set(day_numbers)
         }
 
@@ -137,7 +128,7 @@ class SimulationManager:
         # Create the passenger events
         events: list[PassengerRequest] = []
         for leave_time in datetimes:
-            day = (leave_time.weekday() + 1) % 7 + 1
+            day = get_day_number(leave_time)
             prob = probabilities[day]
             stops = self.route_manager.stops
             src_station = np.random.choice(stops, p=prob)

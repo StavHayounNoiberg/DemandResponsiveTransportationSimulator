@@ -6,7 +6,7 @@ from FinalProjectSimulator.data_repo.db_pool import get_timeseries_con
 logger = logging.getLogger(__name__)
 
 
-def fetch_timeseries_data_by_primary_key(
+def get_timeseries_data_by_primary_key(
     full_line_id: str, day: int, data_type: str
 ) -> pd.DataFrame | None:
     try:

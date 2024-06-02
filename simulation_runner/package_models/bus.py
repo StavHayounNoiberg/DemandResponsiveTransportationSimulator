@@ -3,16 +3,16 @@ import logging
 from FinalProjectSimulator.simulation_runner.package_models.event import Event
 
 
+
 logger = logging.getLogger(__name__)
 
 
 class Bus:
-    _id_counter = 1  # class-level variable to keep track of IDs
-
-    def __init__(self):
-        self.id = Bus._id_counter
+    def __init__(self, id: int, line_manager, leave_time: datetime):
+        self.id = id
         Bus._id_counter += 1
-        # self.line_manager: LineManager = line_manager
+        self.line_manager = line_manager
+        self.leave_time = leave_time
         self.route: list[tuple["Stop", datetime]] = []
         self.last_stop: Stop = None
         self.next_stop: Stop = None
@@ -78,5 +78,8 @@ class Bus:
         pass
 
 
+from FinalProjectSimulator.simulation_runner.package_models.bus_at_stop import BusAtStop
+#from FinalProjectSimulator.simulation_runner.package_models.bus_finish import BusFinish
+from FinalProjectSimulator.simulation_runner.package_models.bus_start import BusStart
 from FinalProjectSimulator.simulation_runner.package_models.passenger import Passenger
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
