@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import heapq
 import logging
 import numpy as np
+from FinalProjectSimulator.data_repo.simulation import save_simulation, save_buses, save_passengers
 from FinalProjectSimulator.data_repo.timeseries import get_timeseries_data_by_primary_key
 from FinalProjectSimulator.data_repo.ridership import get_stations_passengers_by_day
 from FinalProjectSimulator.models.simulation import Simulation
@@ -73,12 +74,14 @@ class SimulationManager:
     def save_results(self) -> bool:
         logger.debug("started")
         logger.info("Saving simulation results")
-        # TODO: save_results should save all passengers and buses data to database
-
+        
         self.simulation.set_duration()
         self.simulation.set_success(True)
-        # TODO: save simulation to database
-
+        
+        save_simulation(self.simulation)
+        save_buses(self.line_manager.buses)
+        save_passengers(self.passengers)
+        
         logger.debug("finished")
         return True
 

@@ -1,6 +1,8 @@
+from datetime import datetime
 import logging
 import pandas as pd
 from FinalProjectSimulator.data_repo.db_pool import get_gtfs_con
+from FinalProjectSimulator.utilities.datetime_utils import get_day_number
 
 
 logger = logging.getLogger(__name__)
@@ -11,7 +13,7 @@ def get_stop_codes_and_arrival_times(trip_id: str) -> pd.DataFrame | None:
         sql_query = f'''SELECT stops.stop_code, stopTimes.arrival_time
         FROM stopTimes
         JOIN stops ON stopTimes.stop_id = stops.stop_id
-        WHERE SUBSTRING_INDEX(stopTimes.trip_id, '_', 1) = '{trip_id}'
+        WHERE stopTimes.trip_id_prefix = '{trip_id}'
         '''
         with get_gtfs_con() as conn:
             df = pd.read_sql(sql_query, conn)
@@ -39,13 +41,29 @@ def get_stop_location(stop_code: str) -> tuple[float, float] | None:
         return None
 
 
-def get_trip_ids_and_departure_times(full_line_id: str, day: int) -> pd.DataFrame | None:
+def get_trip_ids_and_departure_times(full_line_id: str, date: datetime) -> pd.DataFrame | None:
     try:
-        line_id = full_line_id.split("-")[0]
-        sql_query = f"SELECT `TripId`, `DepartureTime` FROM tripIdToDate WHERE `OfficeLineId` = '{line_id}' AND DATE(`ToDate`) = '2200-01-01' AND `DayInWeek` = {day}"
+        line_id_parts = full_line_id.split("-")
+        day = get_day_number(date)
+        time = date.time()
+        sql_query = f'''SELECT `TripId`, `DepartureTime` 
+        FROM tripIdToDate 
+        WHERE `OfficeLineId` = '{line_id_parts[0]}' 
+        AND `Direction` = '{line_id_parts[1]}' 
+        AND `LineAlternative` = '{line_id_parts[2]}' 
+        AND DATE(`ToDate`) = '2200-01-01' 
+        AND `DayInWeek` = {day}
+        AND `DepartureTime` >= '{time}'
+        '''
         with get_gtfs_con() as conn:
             df = pd.read_sql(sql_query, conn)
+
+            # Convert `DepartureTime` from timedelta to datetime
+            base_date = date.date()
+            df['DepartureTime'] = df['DepartureTime'].apply(lambda td: datetime.combine(base_date, datetime.min.time()) + td)
+            
             return df
+        
     except Exception as e:
         logger.error(e)
         return None

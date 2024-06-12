@@ -39,12 +39,14 @@ class RouteManager:
 
         for stop_code, arrival_time in stop_codes_and_times.itertuples(index=False):
             stop = next(
-                (stop for stop in self.stops if stop.code == stop_code), None)
+                (stop for stop in self.stops if stop.id == stop_code), None)
             if stop is None:
                 logger.error(
                     "Stop with code %s not found in simulation stops", stop_code)
                 return []
-            route.append((stop, arrival_time))
+            arrival_datetime = datetime.combine(
+                bus.leave_time.date(), (datetime.min + arrival_time).time())
+            route.append((stop, arrival_datetime))
 
         route.sort(key=lambda x: x[1])
         logger.debug("finished")
@@ -56,7 +58,7 @@ class RouteManager:
 
         green_stations = get_green_stations(
             self.simulation.line_id, bus.leave_time)
-        express_stops: list[Stop] = self.stops[0]  # Start with the first stop
+        express_stops: list[Stop] = [self.stops[0]]  # Start with the first stop
         for stop_code, stop_sequence in green_stations.itertuples(index=False):
             stop = next(
                 (stop for stop in self.stops if stop.ordinal_number == stop_sequence), None)

@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
 
 # Initialize the Google Maps client
-gmaps = googlemaps.Client(key=API_KEY)
+gmaps = googlemaps.Client(key='AIzaSyBh_8NtC_OKUtV381xzxxs3A6NmJie2IN8')
 
 
-def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="transit") -> list[datetime]:
+def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[datetime]:
     if len(waypoints) < 2:
         logger.error("Not enough waypoints provided")
         return None

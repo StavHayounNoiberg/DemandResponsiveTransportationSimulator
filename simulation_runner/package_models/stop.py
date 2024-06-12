@@ -14,22 +14,22 @@ class Stop:
         self.buses: list[tuple["Bus", datetime]] = []
         self.passengers: list["Passenger"] = []
 
-    def add_bus(self, bus: "Bus") -> bool:
+    def add_bus(self, bus: "Bus", time: datetime) -> bool:
         logger.debug("started")
-        logger.info("Adding bus %d to stop %d", bus.id, self.id)
+        logger.info("Adding bus %d to stop %d at %s", bus.id, self.id, time)
         try:
-            self.buses.append(bus)
+            self.buses.append((bus, time))
             logger.debug("finished")
             return True
         except Exception as e:
             logger.error(e)
             return False
 
-    def remove_bus(self, bus: "Bus") -> bool:
+    def remove_bus(self, bus_to_remove: "Bus") -> bool:
         logger.debug("started")
-        logger.info("Removing bus %d from stop %d", bus.id, self.id)
+        logger.info("Removing bus %d from stop %d", bus_to_remove.id, self.id)
         try:
-            self.buses.remove(bus)
+            self.buses[:] = [(bus, dt) for bus, dt in self.buses if bus != bus_to_remove]
             logger.debug("finished")
             return True
         except Exception as e:

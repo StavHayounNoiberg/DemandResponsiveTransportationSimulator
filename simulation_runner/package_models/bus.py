@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 class Bus:
     def __init__(self, id: int, line_manager, leave_time: datetime):
         self.id = id
-        Bus._id_counter += 1
         self.line_manager = line_manager
         self.leave_time = leave_time
         self.route: list[tuple["Stop", datetime]] = []

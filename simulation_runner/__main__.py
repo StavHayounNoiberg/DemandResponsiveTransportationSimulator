@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 if __name__ == "__main__":
     # Get parameters sent from the command line (simulation_id, line_id, start_time, end_time, express_rate, reporting_rate, line_id)
     try:
+        logger.info("Simulation starting")
         simulation_start_time = datetime.now()
         if len(sys.argv) >= 6:
             simulation_id = sys.argv[1]

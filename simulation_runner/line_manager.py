@@ -22,11 +22,10 @@ class LineManager:
 
         date_list = get_datetimes_between(
             self.simulation.start_time, self.simulation.end_time)
-        day_numbers = [get_day_number(dt) for dt in date_list]
-
-        for i in range(len(day_numbers)):
+        
+        for date in date_list:
             gtfs_data = get_trip_ids_and_departure_times(
-                self.simulation.line_id, day_numbers[i])
+                self.simulation.line_id, date)
             for trip_id, departure_time in gtfs_data.itertuples(index=False):
                 bus, bus_stops = None, None
                 is_express = np.random.choice([True, False], p=[

@@ -26,9 +26,7 @@ timeseries_engine = create_engine_from_config(
 ridership_engine = create_engine_from_config(config["mysql"], "GTFS_Ridership")
 analyzedLines_engine = create_engine_from_config(
     config["mysql"], "AnalyzedLines")
-# simulation_engine = create_engine_from_config(config["mysql"], "SimulationResults")
-
-# Simulation_Session = sessionmaker(bind=simulation_engine)
+simulation_engine = create_engine_from_config(config["mysql"], "SimulationResults")
 
 
 def get_gtfs_con():
@@ -47,5 +45,5 @@ def get_analyzedLines_con():
     return analyzedLines_engine.connect()
 
 
-# def get_simulation_con():
-#     return simulation_engine.connect()
+def get_simulation_con():
+    return simulation_engine.connect()
