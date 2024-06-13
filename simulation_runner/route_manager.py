@@ -71,7 +71,8 @@ class RouteManager:
         if express_stops[-1].ordinal_number != self.stops[-1].ordinal_number:
             express_stops.append(self.stops[-1])
         express_stops.sort(key=lambda x: x.ordinal_number)
-        express_stops_time = get_route(bus.leave_time, express_stops)
+        stops_locations = [stop.location for stop in express_stops]
+        express_stops_time = get_route(bus.leave_time, stops_locations)
         # Create a dictionary to map express stops to their times
         express_stop_times = {
             express_stops[i].ordinal_number: express_stops_time[i] for i in range(len(express_stops))}

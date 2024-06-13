@@ -79,8 +79,8 @@ class SimulationManager:
         self.simulation.set_success(True)
         
         save_simulation(self.simulation)
-        save_buses(self.line_manager.buses)
-        save_passengers(self.passengers)
+        save_buses(self.simulation.id, self.line_manager.buses)
+        save_passengers(self.simulation.id, self.passengers)
         
         logger.debug("finished")
         return True
