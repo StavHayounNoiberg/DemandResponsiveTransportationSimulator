@@ -21,7 +21,7 @@ class PassengerArrived(Event):
                          self.passenger.id, self.passenger.stop_src.id)
             return False
         logger.debug("finished")
-        pass
+        return True
 
 
 from FinalProjectSimulator.simulation_runner.simulation_manager import SimulationManager

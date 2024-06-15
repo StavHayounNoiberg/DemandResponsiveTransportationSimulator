@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class Passenger:
-    _id_counter = 1  # class-level variable to keep track of IDs
+    __id_counter = 1  # class-level variable to keep track of IDs
 
     def __init__(
         self,
@@ -18,8 +18,8 @@ class Passenger:
         reporting_time: datetime,
         leaving_time: datetime,
     ):
-        self.id = Passenger._id_counter
-        Passenger._id_counter += 1
+        self.id = Passenger.__id_counter
+        Passenger.__id_counter += 1
         self.stop_src = stop_src
         self.stop_dest = stop_dest
         self.reporting_time = reporting_time

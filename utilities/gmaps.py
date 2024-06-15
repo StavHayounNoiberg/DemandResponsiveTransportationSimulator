@@ -1,6 +1,6 @@
 import logging
 import googlemaps
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 logger = logging.getLogger(__name__)
@@ -13,7 +13,16 @@ API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
 gmaps = googlemaps.Client(key='AIzaSyBh_8NtC_OKUtV381xzxxs3A6NmJie2IN8')
 
 
-def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[datetime]:
+def get_route_timedeltas(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[timedelta]:
+
+    timedeltas: list[timedelta] = [timedelta(seconds=0)]
+
+    departure_time = leave_time
+    if departure_time < datetime.now():
+        diff = datetime.now() - departure_time
+        weeks_to_add = (diff.days // 7) + 1
+        departure_time += timedelta(weeks=weeks_to_add)
+
     if len(waypoints) < 2:
         logger.error("Not enough waypoints provided")
         return None
@@ -22,89 +31,37 @@ def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="
     end_coords = waypoints[-1]
     waypoints = waypoints[1:-1]
 
-    # Request public transport directions with waypoints
-    directions_result = gmaps.directions(start_coords,
-                                         end_coords,
-                                         mode=mode,
-                                         waypoints=waypoints,
-                                         departure_time=leave_time)
+    try:
+        # Request public transport directions with waypoints
+        directions_result = gmaps.directions(start_coords,
+                                             end_coords,
+                                             mode=mode,
+                                             waypoints=waypoints,
+                                             departure_time=departure_time)
 
-    # Extract and print the route length, duration, and time of arrival at each stop
-    if directions_result:
-        legs = directions_result[0]['legs']
-        total_distance_meters = 0
-        total_duration_seconds = 0
+        # Extract and print the route length, duration, and time of arrival at each stop
+        if directions_result:
+            legs = directions_result[0]['legs']
+            total_duration_seconds = 0
 
-        for i, leg in enumerate(legs):
-            total_distance_meters += leg['distance']['value']
-            total_duration_seconds += leg['duration']['value']
+            for _, leg in enumerate(legs):
+                total_duration_seconds += leg['duration']['value']
+                timedeltas.append(timedelta(seconds=total_duration_seconds))
+                
+            return timedeltas
 
-            for step in leg['steps']:
-                if 'transit_details' in step:
-                    arrival_time = step['transit_details']['arrival_time']['text']
-                    stop_name = step['transit_details']['arrival_stop']['name']
-                    print(f"Arrival at {stop_name}: {arrival_time}")
+        else:
+            raise Exception("No directions found")
 
-        total_distance_km = total_distance_meters / 1000
-        total_duration_minutes = total_duration_seconds / 60
-
-        print(f"Route length: {total_distance_km:.2f} km")
-        print(f"Route duration: {total_duration_minutes:.2f} minutes")
-    else:
-        print("No public transport route found.")
-
-    # # Extract and print the route length, duration, and time of arrival at each stop
-    # if directions_result:
-    #     legs = directions_result[0]['legs']
-    #     total_distance_meters = 0
-    #     total_duration_seconds = 0
-
-    #     for i, leg in enumerate(legs):
-    #         total_distance_meters += leg['distance']['value']
-    #         total_duration_seconds += leg['duration']['value']
-
-    #         for step in leg['steps']:
-    #             if 'transit_details' in step:
-    #                 arrival_time = step['transit_details']['arrival_time']['text']
+    except Exception as e:
+        logger.error(e)
+        return None
 
 
-# # Define the coordinates for start, end points, and waypoints
-# # Example: New York, Empire State Building
-# start_coords = (40.748817, -73.985428)
-# end_coords = (40.730610, -73.935242)    # Example: New York, Brooklyn
-# waypoints = [
-#     (40.752726, -73.977229),  # Example: New York, Grand Central Terminal
-#     (40.741895, -73.989308)   # Example: New York, Flatiron Building
-# ]
+def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[timedelta]:
+    timedeltas = get_route_timedeltas(leave_time, waypoints, mode)
+    if timedeltas is None:
+        return None
 
-# # Request public transport directions with waypoints
-# now = datetime.now()
-# directions_result = gmaps.directions(start_coords,
-#                                      end_coords,
-#                                      mode="transit",
-#                                      waypoints=waypoints,
-#                                      departure_time=now)
-
-# # # Extract and print the route length, duration, and time of arrival at each stop
-# # if directions_result:
-# #     legs = directions_result[0]['legs']
-# #     total_distance_meters = 0
-# #     total_duration_seconds = 0
-
-# #     for i, leg in enumerate(legs):
-# #         total_distance_meters += leg['distance']['value']
-# #         total_duration_seconds += leg['duration']['value']
-
-# #         for step in leg['steps']:
-# #             if 'transit_details' in step:
-# #                 arrival_time = step['transit_details']['arrival_time']['text']
-# #                 stop_name = step['transit_details']['arrival_stop']['name']
-# #                 print(f"Arrival at {stop_name}: {arrival_time}")
-
-# #     total_distance_km = total_distance_meters / 1000
-# #     total_duration_minutes = total_duration_seconds / 60
-
-# #     print(f"Route length: {total_distance_km:.2f} km")
-# #     print(f"Route duration: {total_duration_minutes:.2f} minutes")
-# # else:
-# #     print("No public transport route found.")
+    datetimes = [leave_time + delta for delta in timedeltas]
+    return datetimes

@@ -1,10 +1,12 @@
-from datetime import datetime
+import logging
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, Float
 from sqlalchemy.types import JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from FinalProjectSimulator.data_repo.db_pool import get_simulation_con
 
+
+logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
@@ -17,7 +19,7 @@ class SimulationData(Base):
     express_rate = Column(Float)
     reporting_rate = Column(Float)
     started_at = Column(DateTime)
-    duration = Column(DateTime)
+    duration_in_mins = Column(Float)
     success = Column(Boolean)
     
     def __init__(self, simulation: "Simulation"):
@@ -28,7 +30,7 @@ class SimulationData(Base):
         self.express_rate = simulation.express_rate
         self.reporting_rate = simulation.reporting_rate
         self.started_at = simulation.started_at
-        self.duration = simulation.duration
+        self.duration = simulation.duration.total_seconds() / 60
         self.success = simulation.success
 
 
@@ -48,8 +50,8 @@ class BusData(Base):
         self.is_express = type(bus) is ExpressBus
         self.leave_time = bus.leave_time
         self.final_dest_arrival_time = bus.route[-1][1]
-        self.route = bus.route
-        self.passengers_enroute = bus.passengers_enroute
+        self.route = bus.prepare_route_for_json()
+        self.passengers_enroute = bus.prepare_passengers_enroute_for_json()
         
 
 class PassengerData(Base):
@@ -74,8 +76,8 @@ class PassengerData(Base):
         self.leaving_time = passenger.leaving_time
         self.aboard_time = passenger.aboard_time
         self.arrival_time = passenger.arrival_time
-        self.bus_id = passenger.bus.id if passenger.bus is not None else None
-        self.assignment_reason = passenger.assignment_reason.value if passenger.assignment_reason is not None else None
+        self.bus_id = passenger.bus.id if passenger.bus is not None else -1
+        self.assignment_reason = passenger.assignment_reason.value if passenger.assignment_reason is not None else -1
 
 
 class AnalysisData(Base):
@@ -99,41 +101,59 @@ Session = sessionmaker(bind=engine)
 
 def save_simulation(simulation: "Simulation"):
     session = Session()
+    try:
+        simulation_data = SimulationData(simulation)
+        session.add(simulation_data)        
+        session.commit()
+        logger.info("Simulation data committed successfully")
 
-    simulation_data = SimulationData(simulation)
-    session.add(simulation_data)
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while committing to the database: {e}")
+        raise
 
-    session.commit()
-
-    session.close()
+    finally:
+        session.close()
 
 
 def save_buses(simulation_id, buses: list["Bus"]):
     session = Session()
-
-    buses_data: list[BusData] = []
-    for bus in buses:
-        buses_data.append(BusData(simulation_id, bus))
+    try:
+        buses_data: list[BusData] = []
+        for bus in buses:
+            buses_data.append(BusData(simulation_id, bus))
+        
+        session.add_all(buses_data)
+        session.commit()
+        logger.info("Buses data committed successfully")
+        
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while committing to the database: {e}")
+        raise
     
-    session.add_all(buses_data)
-
-    session.commit()
-
-    session.close()
-    
-    
+    finally:
+        session.close()
+        
+        
 def save_passengers(simulation_id, passengers: list["Passenger"]):
     session = Session()
-
-    passengers_data: list[PassengerData] = []
-    for passenger in passengers:
-        passengers_data.append(PassengerData(simulation_id, passenger))
+    try:
+        passengers_data: list[PassengerData] = []
+        for passenger in passengers:
+            passengers_data.append(PassengerData(simulation_id, passenger))
+        
+        session.add_all(passengers_data)
+        session.commit()
+        logger.info("Passengers data committed successfully")
     
-    session.add_all(passengers_data)
-
-    session.commit()
-
-    session.close()
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while committing to the database: {e}")
+        raise
+    
+    finally:
+        session.close()
 
 
 def save_analysis():

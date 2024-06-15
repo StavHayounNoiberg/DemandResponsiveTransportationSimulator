@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class BusStart(Event):
     def __init__(self, simulation_manager, time: datetime, bus: "Bus"):
-        super().__init__(simulation_manager)
+        super().__init__(simulation_manager, time)
         self.bus = bus
 
     def handle(self) -> bool:

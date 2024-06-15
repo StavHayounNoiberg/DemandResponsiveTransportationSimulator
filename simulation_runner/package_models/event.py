@@ -2,11 +2,11 @@ from datetime import datetime
 
 
 class Event:
-    _id_counter = 1  # class-level variable to keep track of IDs
+    __id_counter = 1  # class-level variable to keep track of IDs
 
     def __init__(self, simulation_manager, time: datetime = None):
-        self.id = Event._id_counter
-        Event._id_counter += 1
+        self.id = Event.__id_counter
+        Event.__id_counter += 1
         self.time: datetime = time
         self.is_handled = False
         self.simulation_manager = simulation_manager

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from FinalProjectSimulator.simulation_runner.package_models.event import Event
 
@@ -21,9 +21,9 @@ class Bus:
         logger.debug("started")
         logger.info("Creating events for bus %d", self.id)
         events_list = [
-            BusStart(self.line_manager.simulation_manager, self.leave_time, self)]
-        events_list.append(BusAtStop(self.line_manager.simulation_manager,
-                           stop[1], self, stop[0]) for stop in self.route)
+            BusStart(self.line_manager.simulation_manager, self.leave_time - timedelta(seconds=1), self)]
+        for stop in self.route:
+            events_list.append(BusAtStop(self.line_manager.simulation_manager, stop[1], self, stop[0]))
         # TODO: decide if to use BusFinish event
         # events_list.append(BusFinish(self.line_manager.simulation_manager, self.route[-1][1], self))
         logger.debug("finished")
@@ -65,8 +65,9 @@ class Bus:
     def update_last_next_stop(self) -> bool:
         logger.debug("started")
         logger.info("Updating last and next stop for bus %d", self.id)
-        # TODO: Implement this method
-
+        last_stop_number = self.last_stop.ordinal_number if self.last_stop is not None else 0
+        self.last_stop = self.next_stop
+        self.next_stop = next((stop for stop, _ in self.route if stop.ordinal_number > last_stop_number), None)
         logger.debug("finished")
         pass
 
@@ -77,10 +78,16 @@ class Bus:
 
         logger.debug("finished")
         pass
+    
+    def prepare_route_for_json(self) -> list[dict]:
+        return [{"stop": stop.id, "time": time.isoformat()} for stop, time in self.route]
+    
+    def prepare_passengers_enroute_for_json(self) -> list[dict]:
+        return [{"origin": origin.id, "destination": destination.id, "passengers": passengers} for (origin, destination), passengers in self.passengers_enroute.items()]
 
 
 from FinalProjectSimulator.simulation_runner.package_models.bus_at_stop import BusAtStop
-#from FinalProjectSimulator.simulation_runner.package_models.bus_finish import BusFinish
+# from FinalProjectSimulator.simulation_runner.package_models.bus_finish import BusFinish
 from FinalProjectSimulator.simulation_runner.package_models.bus_start import BusStart
 from FinalProjectSimulator.simulation_runner.package_models.passenger import Passenger
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
