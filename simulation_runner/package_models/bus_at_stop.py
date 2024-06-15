@@ -15,7 +15,8 @@ class BusAtStop(Event):
     def handle(self) -> bool:
         logger.debug("started")
         logger.info(
-            "Handling BusAtStop event for bus %d at stop %d",
+            "Event time: %s Event: BusAtStop for bus %d at stop %d",
+            self.time.isoformat(),
             self.bus.id,
             self.stop.id,
         )

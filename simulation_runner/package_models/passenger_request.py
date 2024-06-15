@@ -30,8 +30,7 @@ class PassengerRequest(Event):
 
     def handle(self) -> bool:
         logger.debug("started")
-        logger.info(
-            "Handling PassengerRequest event with id %d", self.id)
+        logger.info("Event time: %s Type: PassengerRequest with id %d", self.time.isoformat(), self.id)
         passenger = Passenger(self.stop_src, self.stop_dest,
                               self.time, self.leaving_time)
         self.simulation_manager.add_passenger(passenger)
@@ -66,7 +65,7 @@ class PassengerRequest(Event):
                             passenger.update_bus(earliest_bus, AssignmentReason.EXPRESS)
                         else:  # should not happen (logically)
                             raise Exception("Missing case! passenger reported before next express bus arrives to the source stop," +
-                                            "earliest bus is of type express, but the earliest bus is not the next express bus")
+                                            " earliest bus is of type express, but the earliest bus is not the next express bus")
                     else:  # if the earliest bus is an ordinary bus
                         passenger.update_bus(earliest_bus, AssignmentReason.ORDINARY_IS_FASTER)
                 else:  # if reported late
@@ -93,6 +92,7 @@ class PassengerRequest(Event):
                                  None)
             if passenger_bus is None:
                 logger.error("No ordinary bus found for passenger %d", passenger.id)
+                passenger.update_bus(None, AssignmentReason.NO_BUS)
                 return False
             
             if not passenger.stop_src.add_passenger(passenger):

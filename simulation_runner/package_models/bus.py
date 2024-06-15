@@ -80,10 +80,10 @@ class Bus:
         pass
     
     def prepare_route_for_json(self) -> list[dict]:
-        return [{"stop": stop.id, "time": time.isoformat()} for stop, time in self.route]
+        return [{"stop": stop.ordinal_number, "time": time.isoformat()} for stop, time in self.route]
     
     def prepare_passengers_enroute_for_json(self) -> list[dict]:
-        return [{"origin": origin.id, "destination": destination.id, "passengers": passengers} for (origin, destination), passengers in self.passengers_enroute.items()]
+        return [{"origin": origin.ordinal_number, "destination": destination.ordinal_number, "passengers": passengers} for (origin, destination), passengers in self.passengers_enroute.items()]
 
 
 from FinalProjectSimulator.simulation_runner.package_models.bus_at_stop import BusAtStop

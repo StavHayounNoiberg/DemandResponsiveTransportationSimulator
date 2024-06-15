@@ -13,7 +13,7 @@ class BusStart(Event):
 
     def handle(self) -> bool:
         logger.debug("started")
-        logger.info("Handling BusStart event for bus %d", self.bus.id)
+        logger.info("Event time: %s Type: BusStart for bus %d", self.time.isoformat(), self.bus.id)
         # TODO: implement handler
 
         logger.debug("finished")

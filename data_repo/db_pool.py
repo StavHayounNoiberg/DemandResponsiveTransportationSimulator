@@ -1,7 +1,6 @@
 import configparser
 import os
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 
 config = configparser.ConfigParser()
@@ -46,4 +45,4 @@ def get_analyzedLines_con():
 
 
 def get_simulation_con():
-    return simulation_engine.connect()
+    return simulation_engine

@@ -15,7 +15,7 @@ class PassengerArrived(Event):
     def handle(self) -> bool:
         logger.debug("started")
         logger.info(
-            "Handling PassengerArrived event for passenger %d", self.passenger.id)
+            "Event time: %s Type: PassengerArrived for passenger %d", self.time.isoformat(), self.passenger.id)
         if self.passenger.stop_src.add_passenger(self.passenger) is False:
             logger.error("Failed to add passenger %d to stop %d",
                          self.passenger.id, self.passenger.stop_src.id)

@@ -30,7 +30,7 @@ class SimulationData(Base):
         self.express_rate = simulation.express_rate
         self.reporting_rate = simulation.reporting_rate
         self.started_at = simulation.started_at
-        self.duration = simulation.duration.total_seconds() / 60
+        self.duration_in_mins = simulation.duration.total_seconds() / 60
         self.success = simulation.success
 
 
@@ -58,20 +58,20 @@ class PassengerData(Base):
     __tablename__ = 'Passengers'
     simulation_id = Column(String(255), primary_key=True)
     passenger_id = Column(Integer, primary_key=True)
-    stop_src = Column(String(50))
-    stop_dest = Column(String(50))
+    stop_src = Column(Integer)
+    stop_dest = Column(Integer)
     reporting_time = Column(DateTime)
     leaving_time = Column(DateTime)
     aboard_time = Column(DateTime)
     arrival_time = Column(DateTime)
-    bus_id = Column(Integer)
+    bus_id = Column(String(50))
     assignment_reason = Column(Integer)
     
     def __init__(self, simulation_id, passenger: "Passenger"):
         self.simulation_id = simulation_id
         self.passenger_id = passenger.id
-        self.stop_src = passenger.stop_src.id
-        self.stop_dest = passenger.stop_dest.id
+        self.stop_src = passenger.stop_src.ordinal_number
+        self.stop_dest = passenger.stop_dest.ordinal_number
         self.reporting_time = passenger.reporting_time
         self.leaving_time = passenger.leaving_time
         self.aboard_time = passenger.aboard_time
@@ -96,13 +96,14 @@ class AnalysisData(Base):
                 
 engine = get_simulation_con()
 Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine, future=True)
 
 
 def save_simulation(simulation: "Simulation"):
     session = Session()
     try:
         simulation_data = SimulationData(simulation)
+        logger.info(f"Committing simulation data: {simulation_data.__dict__}")
         session.add(simulation_data)        
         session.commit()
         logger.info("Simulation data committed successfully")
@@ -121,7 +122,8 @@ def save_buses(simulation_id, buses: list["Bus"]):
     try:
         buses_data: list[BusData] = []
         for bus in buses:
-            buses_data.append(BusData(simulation_id, bus))
+            bus_data = BusData(simulation_id, bus)
+            buses_data.append(bus_data)
         
         session.add_all(buses_data)
         session.commit()
