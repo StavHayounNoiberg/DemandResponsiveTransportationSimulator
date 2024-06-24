@@ -4,7 +4,7 @@ import numpy as np
 from FinalProjectSimulator.data_repo.gtfs import get_trip_ids_and_departure_times
 from FinalProjectSimulator.models.simulation import Simulation
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
-from FinalProjectSimulator.utilities.datetime_utils import get_day_number, get_datetimes_between
+from FinalProjectSimulator.utilities.datetime_utils import get_datetimes_between
 
 
 logger = logging.getLogger(__name__)
@@ -67,7 +67,15 @@ class LineManager:
         logger.debug("started")
         logger.info("Finding next express bus for stop %d", stop.id)
 
-        next_bus = next((bus for bus in self.buses if type(bus) is ExpressBus and bus.next_stop is not None and bus.next_stop.ordinal_number <= stop.ordinal_number), None)
+        next_bus = next(
+            (bus for bus in self.buses 
+            if type(bus) is ExpressBus 
+            and bus.next_stop is not None 
+            and bus.next_stop.ordinal_number <= stop.ordinal_number 
+            and any(route_stop == stop and arrival_time >= desired_time for route_stop, arrival_time in bus.route)), 
+            None
+        )
+        
         if next_bus is None:
             logger.warning("No express bus found for stop %d", stop.id)
             return None

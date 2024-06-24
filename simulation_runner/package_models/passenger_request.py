@@ -36,8 +36,13 @@ class PassengerRequest(Event):
         self.simulation_manager.add_passenger(passenger)
         
         # find the bus in the source stop buses list that arrives first to the destination stop
-        source_buses = [bus for bus, stop_time in self.stop_src.buses if stop_time >= self.leaving_time and stop_time < (
-            self.leaving_time.replace(hour=0, minute=0, second=0) + timedelta(days=1))]
+        source_buses = []
+        end_of_day = self.leaving_time.replace(hour=0, minute=0, second=0) + timedelta(days=1)
+
+        for bus, stop_time in self.stop_src.buses:
+            if stop_time >= self.leaving_time and stop_time < end_of_day:
+                source_buses.append(bus)
+                
         next_express_bus = self.simulation_manager.line_manager.find_next_express_bus(
                 passenger.stop_src, passenger.leaving_time)
         earliest_bus = self.simulation_manager.route_manager.earliest_bus_arriving_stop(
