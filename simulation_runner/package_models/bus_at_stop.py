@@ -20,10 +20,28 @@ class BusAtStop(Event):
             self.bus.id,
             self.stop.id,
         )
-        # TODO: implement handler
+        if self.bus.update_last_next_stop() is False:
+            logger.error("Failed to update last and next stops")
+            logger.debug("finished")
+            return False
+        
+        for passenger in self.bus.passengers:
+            if passenger.stop_dest == self.stop:
+                passenger.update_arrival(self.time)
+                self.bus.remove_passenger(passenger)
+                
+        for passenger in self.stop.passengers:
+            if passenger.bus == self.bus:
+                passenger.update_aboard(self.time)
+                self.stop.remove_passenger(passenger)
+                self.bus.add_passenger(passenger)
+        
+        self.bus.update_passengers_enroute()
+        
+        self.stop.remove_bus(self.bus)
 
         logger.debug("finished")
-        pass
+        return True
 
 
 from FinalProjectSimulator.simulation_runner.package_models.bus import Bus

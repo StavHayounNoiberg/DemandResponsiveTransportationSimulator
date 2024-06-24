@@ -65,25 +65,25 @@ class Bus:
     def update_last_next_stop(self) -> bool:
         logger.debug("started")
         logger.info("Updating last and next stop for bus %d", self.id)
-        last_stop_number = self.last_stop.ordinal_number if self.last_stop is not None else 0
         self.last_stop = self.next_stop
+        last_stop_number = self.last_stop.ordinal_number if self.last_stop is not None else 0
         self.next_stop = next((stop for stop, _ in self.route if stop.ordinal_number > last_stop_number), None)
         logger.debug("finished")
-        pass
+        return True
 
     def update_passengers_enroute(self) -> int:
         logger.debug("started")
-        logger.info("Updating passengers enroute for bus %d", self.id)
-        # TODO: Implement this method
-
+        passengers_enroute = len(self.passengers)
+        logger.info("Updating passengers enroute for bus %d, %d passengers", self.id, passengers_enroute)
+        self.passengers_enroute[(self.last_stop, self.next_stop)] = passengers_enroute
         logger.debug("finished")
-        pass
+        return passengers_enroute
     
     def prepare_route_for_json(self) -> list[dict]:
         return [{"stop": stop.ordinal_number, "time": time.isoformat()} for stop, time in self.route]
     
     def prepare_passengers_enroute_for_json(self) -> list[dict]:
-        return [{"origin": origin.ordinal_number, "destination": destination.ordinal_number, "passengers": passengers} for (origin, destination), passengers in self.passengers_enroute.items()]
+        return [{"origin": origin.ordinal_number, "destination": destination.ordinal_number if destination is not None else -1, "passengers": passengers} for (origin, destination), passengers in self.passengers_enroute.items()]
 
 
 from FinalProjectSimulator.simulation_runner.package_models.bus_at_stop import BusAtStop

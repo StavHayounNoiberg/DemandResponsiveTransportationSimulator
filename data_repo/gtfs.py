@@ -17,6 +17,7 @@ def get_stop_codes_and_arrival_times(trip_id: str) -> pd.DataFrame | None:
         '''
         with get_gtfs_con() as conn:
             df = pd.read_sql(sql_query, conn)
+            df = df.drop_duplicates(subset=['stop_code'])
             return df
     except Exception as e:
         logger.error(e)

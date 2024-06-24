@@ -32,12 +32,12 @@ class LineManager:
                 is_express = np.random.choice([True, False], p=[self.simulation.express_rate, 1 - self.simulation.express_rate])
                 if is_express:
                     bus = ExpressBus(trip_id, self, departure_time)
-                    bus_stops = (self.simulation_manager.route_manager.create_express_route(bus))
-                    pending_stops = [(stop, time) for stop, time, is_green in bus_stops if is_green]
+                    bus_stops = (self.simulation_manager.route_manager.create_initial_express_route(bus))
+                    pending_stops = [stop for stop, _, is_green in bus_stops if is_green]
                     if bus.set_pending_stops(pending_stops) is False:
                         logger.error("Failed to set pending stops for express bus %d", bus.id)
                         return []
-                    bus_route = [(stop, time) for stop, time, is_green in bus_stops]
+                    bus_route = [(stop, time) for stop, time, _ in bus_stops]
                     if bus.update_route(bus_route) is False:
                         logger.error("Failed to update route for express bus %d", self.id)
                         return []

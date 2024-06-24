@@ -14,10 +14,14 @@ class BusFinish(Event):
     def handle(self) -> bool:
         logger.debug("started")
         logger.info("Event time: %s Type: BusFinish for bus %d", self.time.isoformat(), self.bus.id)
-        # TODO: implement handler
-
+        
+        # validating that no passengers left on the bus
+        if len(self.bus.passengers) > 0:
+            logger.error("Bus %d has passengers left on it", self.bus.id)
+            raise Exception("Bus %d has passengers left on it", self.bus.id)
+        
         logger.debug("finished")
-        pass
+        return True
 
 
 from FinalProjectSimulator.simulation_runner.package_models.bus import Bus

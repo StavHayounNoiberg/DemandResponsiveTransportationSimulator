@@ -4,7 +4,7 @@ from FinalProjectSimulator.data_repo.analyzed_lines import get_green_stations
 from FinalProjectSimulator.data_repo.gtfs import get_stop_codes_and_arrival_times, get_stop_location, get_trip_ids_and_departure_times
 from FinalProjectSimulator.data_repo.ridership import get_all_stations
 from FinalProjectSimulator.models.simulation import Simulation
-from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
+from FinalProjectSimulator.simulation_runner.package_models.express_bus import Bus, ExpressBus
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
 from FinalProjectSimulator.utilities.gmaps import get_route_timedeltas, get_route
 
@@ -56,7 +56,7 @@ class RouteManager:
         logger.debug("finished")
         return route
 
-    def create_express_route(self, bus: Bus) -> list[tuple[Stop, datetime, bool]]:
+    def create_initial_express_route(self, bus: Bus) -> list[tuple[Stop, datetime, bool]]:
         logger.debug("started")
         logger.info("Creating express route for bus %d", bus.id)
 
@@ -70,7 +70,8 @@ class RouteManager:
                 logger.error(
                     "Stop with code %s not found in simulation stops", stop_code)
                 return []
-            express_stops.append(stop)
+            if stop not in express_stops:
+                express_stops.append(stop)
         # Add the last stop
         if express_stops[-1].ordinal_number != self.stops[-1].ordinal_number:
             express_stops.append(self.stops[-1])
@@ -93,6 +94,13 @@ class RouteManager:
 
         logger.debug("finished")
         return route
+    
+    def create_express_route(self, bus: ExpressBus) -> list[tuple[Stop, datetime]]:
+        bus.pending_stops.sort(key=lambda x: x.ordinal_number)
+        stops_locations = [stop.location for stop in bus.pending_stops]
+        stops_datetimes = get_route(bus.leave_time, stops_locations)
+        route = list(zip(bus.pending_stops, stops_datetimes))
+        return route
 
     def earliest_bus_arriving_stop(self, buses: list["Bus"], stop: "Stop") -> "Bus":
         earliest_bus = None
@@ -107,7 +115,7 @@ class RouteManager:
                 ),
                 None,
             )
-            if earliest_time is None or arrival_time < earliest_time:
+            if arrival_time is not None and (earliest_time is None or arrival_time < earliest_time):
                 earliest_time = arrival_time
                 earliest_bus = bus
 

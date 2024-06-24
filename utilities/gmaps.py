@@ -23,10 +23,6 @@ def get_route_timedeltas(leave_time: datetime, waypoints: list[tuple[float, floa
         weeks_to_add = (diff.days // 7) + 1
         departure_time += timedelta(weeks=weeks_to_add)
 
-    if len(waypoints) < 2:
-        logger.error("Not enough waypoints provided")
-        return None
-
     start_coords = waypoints[0]
     end_coords = waypoints[-1]
     waypoints = waypoints[1:-1]
@@ -58,10 +54,23 @@ def get_route_timedeltas(leave_time: datetime, waypoints: list[tuple[float, floa
         return None
 
 
-def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[timedelta]:
-    timedeltas = get_route_timedeltas(leave_time, waypoints, mode)
-    if timedeltas is None:
+def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[datetime]:
+    if len(waypoints) < 2:
+        logger.error("Not enough waypoints provided")
         return None
+    
+    datetimes: list[datetime] = []
+    last_time = leave_time
+    for i in range(0, len(waypoints), 25):
+        timedeltas = get_route_timedeltas(last_time, waypoints[i:i+25], mode)
+        if timedeltas is None:
+            return None
+        datetimes.extend([last_time + delta for delta in timedeltas])
+        last_time = datetimes[-1]
+    
+    # timedeltas = get_route_timedeltas(leave_time, waypoints, mode)
+    # if timedeltas is None:
+    #     return None
 
-    datetimes = [leave_time + delta for delta in timedeltas]
+    # datetimes = [leave_time + delta for delta in timedeltas]
     return datetimes

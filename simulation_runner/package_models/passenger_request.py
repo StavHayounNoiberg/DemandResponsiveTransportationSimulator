@@ -67,7 +67,9 @@ class PassengerRequest(Event):
                 if next_express_bus.leave_time > passenger.reporting_time:  # if reported on time
                     if type(earliest_bus) is ExpressBus:  # if the earliest bus is an express bus
                         if earliest_bus == next_express_bus:  # if the earliest bus is the next express bus
-                            passenger.update_bus(earliest_bus, AssignmentReason.EXPRESS)
+                            next_express_bus.add_stop(passenger.stop_src)
+                            next_express_bus.add_stop(passenger.stop_dest)
+                            passenger.update_bus(next_express_bus, AssignmentReason.EXPRESS)
                         else:  # should not happen (logically)
                             raise Exception("Missing case! passenger reported before next express bus arrives to the source stop," +
                                             " earliest bus is of type express, but the earliest bus is not the next express bus")
@@ -76,13 +78,13 @@ class PassengerRequest(Event):
                 else:  # if reported late
                     if type(earliest_bus) is ExpressBus:  # if the earliest bus is an express bus
                         if earliest_bus == next_express_bus:  # if the earliest bus is the next express bus
-                            passenger.update_bus(earliest_bus, AssignmentReason.LUCKY_EXPRESS_REPORTING)
+                            passenger.update_bus(next_express_bus, AssignmentReason.LUCKY_EXPRESS_REPORTING)
                         else:  # if the earliest bus is not the next express bus, but its still an express bus
                             passenger.update_bus(earliest_bus, AssignmentReason.LATE_REPORT_EXPRESS)
                     else:  # if the earliest bus is an ordinary bus
                         # if the next express bus stops at the source and destination stops (but still not the fastest)
                         if all(any(stop == s for stop, _ in next_express_bus.route) for s in [self.stop_src, self.stop_dest]):
-                            passenger.update_bus(next_express_bus, AssignmentReason.LUCKY_ORDINARY_IS_FASTER)
+                            passenger.update_bus(earliest_bus, AssignmentReason.LUCKY_ORDINARY_IS_FASTER)
                         else:  # if the next express bus does not stop at the source and destination stops
                             passenger.update_bus(earliest_bus, AssignmentReason.LATE_REPORT)
             else:  # if there is no express bus in future
