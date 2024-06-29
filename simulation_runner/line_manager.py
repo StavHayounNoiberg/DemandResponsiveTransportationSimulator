@@ -61,6 +61,7 @@ class LineManager:
                 self.buses.append(bus)
 
         logger.debug("finished")
+        self.buses.sort(key=lambda x: x.leave_time)
         return self.buses
 
     def find_next_express_bus(self, stop: Stop, desired_time: datetime) -> "Bus":

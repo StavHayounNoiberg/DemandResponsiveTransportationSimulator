@@ -44,9 +44,7 @@ class BusStart(Event):
             #     logger.error("Failed to insert BusFinish event")
             #     logger.debug("finished")
             #     return False
-        
-        self.bus.update_last_next_stop()            
-            
+                    
         logger.debug("finished")
         return True
 

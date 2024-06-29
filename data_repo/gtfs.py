@@ -62,6 +62,7 @@ def get_trip_ids_and_departure_times(full_line_id: str, date: datetime) -> pd.Da
             # Convert `DepartureTime` from timedelta to datetime
             base_date = date.date()
             df['DepartureTime'] = df['DepartureTime'].apply(lambda td: datetime.combine(base_date, datetime.min.time()) + td)
+            df.sort_values(by='DepartureTime', inplace=True)
             
             return df
         

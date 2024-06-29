@@ -22,6 +22,11 @@ class Bus:
         logger.info("Creating events for bus %d", self.id)
         events_list = [
             BusStart(self.line_manager.simulation_manager, self.leave_time - timedelta(seconds=1), self)]
+        
+        if type(self) is not Bus:  # so it is express bus, bus at stop events will be created in BusStart event
+            logger.debug("finished")
+            return events_list
+        
         for stop in self.route:
             events_list.append(BusAtStop(self.line_manager.simulation_manager, stop[1], self, stop[0]))
         # TODO: decide if to use BusFinish event
