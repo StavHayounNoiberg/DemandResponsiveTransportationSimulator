@@ -41,10 +41,6 @@ class LineManager:
                     if bus.update_route(bus_route) is False:
                         logger.error("Failed to update route for express bus %d", self.id)
                         return []
-                    
-                    # TODO: Check performance and decide if to use approximate route
-                    # approximate_route = self.simulation_manager.route_manager.get_approximate_route()
-                    # bus_stops = [(stop, departure_time + time) for stop, time in approximate_route]
                 else:
                     bus = Bus(trip_id, self, departure_time)
                     bus_stops = self.simulation_manager.route_manager.create_route(bus)

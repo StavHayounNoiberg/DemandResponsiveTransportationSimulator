@@ -16,7 +16,6 @@ class RouteManager:
     def __init__(self, simulation: Simulation):
         self.simulation = simulation
         self.stops: list[Stop] = []
-        self.approximate_route: list[tuple[Stop, timedelta]] = []
         self.general_route: list[tuple[Stop, timedelta]] = None
 
     def create_stops(self) -> list[Stop]:
@@ -31,13 +30,6 @@ class RouteManager:
         self.stops.sort(key=lambda x: x.ordinal_number)
         logger.debug("finished")
         return self.stops
-    
-    def get_approximate_route(self) -> list[tuple[Stop, timedelta]]:
-        logger.debug("started")
-        if len(self.approximate_route) == 0:
-            self.__create_approximate_route()
-        logger.debug("finished")
-        return self.approximate_route
 
     def create_route(self, bus: Bus) -> list[tuple[Stop, datetime]]:
         logger.debug("started")
@@ -120,30 +112,6 @@ class RouteManager:
                 earliest_bus = bus
 
         return earliest_bus
-    
-    def __create_approximate_route(self):
-        logger.debug("started")
-        logger.info("Creating approximate route for line %s", self.simulation.line_id)
-
-        green_stations = get_green_stations(
-            self.simulation.line_id, self.simulation.start_time)
-        express_stops: list[Stop] = [self.stops[0]]  # Start with the first stop
-        for stop_code, stop_sequence in green_stations.itertuples(index=False):
-            stop = next(
-                (stop for stop in self.stops if stop.ordinal_number == stop_sequence), None)
-            if stop is None:
-                logger.error(
-                    "Stop with code %s not found in simulation stops", stop_code)
-                return []
-            express_stops.append(stop)
-        # Add the last stop
-        if express_stops[-1].ordinal_number != self.stops[-1].ordinal_number:
-            express_stops.append(self.stops[-1])
-        express_stops.sort(key=lambda x: x.ordinal_number)
-        stops_locations = [stop.location for stop in express_stops]
-        stops_timedeltas = get_route_timedeltas(self.simulation.start_time, stops_locations)
-        self.approximate_route = list(zip(express_stops, stops_timedeltas))
-        logger.debug("finished")
         
     def __create_general_route(self) -> list[tuple[Stop, timedelta]]:
         logger.debug("started")
