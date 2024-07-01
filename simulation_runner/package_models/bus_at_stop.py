@@ -25,12 +25,14 @@ class BusAtStop(Event):
             logger.debug("finished")
             return False
         
-        to_remove_from_bus = [passenger for passenger in self.bus.passengers if passenger.stop_dest == self.stop]
+        # Remove passengers from the bus if their destination is the current stop
+        to_remove_from_bus = [p for p in self.bus.passengers if p.stop_dest == self.stop]
         for passenger in to_remove_from_bus:
             passenger.update_arrival(self.time)
             self.bus.remove_passenger(passenger)
-                        
-        to_remove_from_stop = [passenger for passenger in self.stop.passengers if passenger.bus == self.bus]
+
+        # Move passengers from the stop to the bus if their bus is the current bus
+        to_remove_from_stop = [p for p in self.stop.passengers if p.bus == self.bus]
         for passenger in to_remove_from_stop:
             passenger.update_aboard(self.time)
             self.bus.add_passenger(passenger)
