@@ -103,7 +103,6 @@ def save_simulation(simulation: "Simulation"):
     session = Session()
     try:
         simulation_data = SimulationData(simulation)
-        logger.info(f"Committing simulation data: {simulation_data.__dict__}")
         session.add(simulation_data)        
         session.commit()
         logger.info("Simulation data committed successfully")
