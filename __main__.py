@@ -6,14 +6,15 @@ import uuid
 
 def main():
     # Get parameters sent from the command line (start_time, end_time, express_rate, reporting_rate, line_ids)
-    if len(sys.argv) >= 6:
+    if len(sys.argv) >= 7:
         start_time = sys.argv[1]
         end_time = sys.argv[2]
         express_rate = sys.argv[3]
         reporting_rate = sys.argv[4]
-        ids_list = sys.argv[5:]
+        iterations = sys.argv[5]
+        ids_list = sys.argv[6:]
     else:
-        start_time, end_time, express_rate, reporting_rate, ids_list = get_user_input()
+        start_time, end_time, express_rate, reporting_rate, iterations, ids_list = get_user_input()
 
     # Start all simulations
     processes_and_ids = []
@@ -30,6 +31,7 @@ def main():
             end_time,
             express_rate,
             reporting_rate,
+            iterations,
         ]
         process = multiprocessing.Process(
             target=subprocess.run, args=(simulation_command,))
@@ -41,38 +43,33 @@ def main():
         process = pair[0]
         process.join()
 
-    # Start all analyzers
-    analyzer_processes = []
-    for pair in processes_and_ids:
-        id = pair[1]
-        analyzer_command = [
-            sys.executable,
-            "-m",
-            "FinalProjectSimulator.simulation_analyzer",
-            id,
-        ]
-        process = multiprocessing.Process(
-            target=subprocess.run, args=(analyzer_command,))
-        analyzer_processes.append(process)
-        process.start()
-
-    # Wait for all analyzers to finish
-    for process in analyzer_processes:
-        process.join()
+    # Start analyzer for all simulations
+    simulation_ids = [id for _, id in processes_and_ids]
+    analyzer_command = [
+        sys.executable,
+        "-m",
+        "FinalProjectSimulator.simulation_analyzer",
+    ]
+    analyzer_command.extend(simulation_ids)
+    
+    process = multiprocessing.Process(
+        target=subprocess.run, args=(analyzer_command,))
+    process.start()
+    process.join()
 
 
 def get_user_input():
     # TODO: Delete this hard coded parameters
     # TODO: Change this to run simulation for a specific line id, and do it # of times
-    return "28-05-2024.12:30", "29-05-2024.14:00", "0.3", "0.8", ["10010-3-#"]
-    start_datetime = input(
-        "Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
+    return "23-06-2024.00:00", "30-06-2024.03:00", "0.2", "0.5", "4", ["10010-3-#"]
+    start_datetime = input("Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
     end_datetime = input("Enter the end datetime (format: DD-MM-YYYY.HH:MM): ")
     express_rate = input("Enter the express rate: ")
     reporting_rate = input("Enter the reporting rate: ")
+    iterations = input("Enter the number of iterations: ")
     ids_str = input("Enter the list of IDs separated by commas: ")
     ids_list = ids_str.split(",")
-    return start_datetime, end_datetime, express_rate, reporting_rate, ids_list
+    return start_datetime, end_datetime, express_rate, reporting_rate, iterations, ids_list
 
 
 def create_simulation_id():
