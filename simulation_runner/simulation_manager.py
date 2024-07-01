@@ -123,6 +123,10 @@ class SimulationManager:
             self.simulation.line_id, day) for day in set(day_numbers)}
         probabilities = {}
         for day, df in ridership_dfs.items():
+            if len(df) > 1:
+                df.loc[df.index[-2], df.columns[-1]] += df.iloc[-1, -1]
+                df.loc[df.index[-1], df.columns[-1]] = 0
+
             daily_averages = df[df.columns[-1]]
             prob = daily_averages / daily_averages.sum()
             probabilities[day] = prob
