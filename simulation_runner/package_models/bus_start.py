@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from FinalProjectSimulator.simulation_runner.package_models.event import Event
 
@@ -39,11 +39,10 @@ class BusStart(Event):
                     logger.debug("finished")
                     return False
                 
-            # TODO: decide if to use BusFinish event
-            # if self.simulation_manager.insert_event(BusFinish(self.simulation_manager, self.bus.route[-1][1], self.bus)) is False:
-            #     logger.error("Failed to insert BusFinish event")
-            #     logger.debug("finished")
-            #     return False
+            if self.simulation_manager.insert_event(BusFinish(self.simulation_manager, self.bus.route[-1][1] + timedelta(milliseconds=1), self.bus)) is False:
+                logger.error("Failed to insert BusFinish event")
+                logger.debug("finished")
+                return False
                     
         logger.debug("finished")
         return True
@@ -51,4 +50,4 @@ class BusStart(Event):
 
 from FinalProjectSimulator.simulation_runner.package_models.bus import Bus
 from FinalProjectSimulator.simulation_runner.package_models.bus_at_stop import BusAtStop
-#from FinalProjectSimulator.simulation_runner.package_models.bus_finish import BusFinish
+from FinalProjectSimulator.simulation_runner.package_models.bus_finish import BusFinish

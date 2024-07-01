@@ -29,8 +29,8 @@ class Bus:
         
         for stop in self.route:
             events_list.append(BusAtStop(self.line_manager.simulation_manager, stop[1], self, stop[0]))
-        # TODO: decide if to use BusFinish event
-        # events_list.append(BusFinish(self.line_manager.simulation_manager, self.route[-1][1], self))
+        events_list.append(BusFinish(self.line_manager.simulation_manager, self.route[-1][1] + timedelta(milliseconds=1), self))
+        
         logger.debug("finished")
         return events_list
 
@@ -100,7 +100,7 @@ class Bus:
 
 
 from FinalProjectSimulator.simulation_runner.package_models.bus_at_stop import BusAtStop
-# from FinalProjectSimulator.simulation_runner.package_models.bus_finish import BusFinish
+from FinalProjectSimulator.simulation_runner.package_models.bus_finish import BusFinish
 from FinalProjectSimulator.simulation_runner.package_models.bus_start import BusStart
 from FinalProjectSimulator.simulation_runner.package_models.passenger import Passenger
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop
