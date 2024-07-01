@@ -60,7 +60,6 @@ def main():
 
 def get_user_input():
     # TODO: Delete this hard coded parameters
-    # TODO: Change this to run simulation for a specific line id, and do it # of times
     return "23-06-2024.00:00", "30-06-2024.03:00", "0.2", "0.5", "4", ["10010-3-#"]
     start_datetime = input("Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
     end_datetime = input("Enter the end datetime (format: DD-MM-YYYY.HH:MM): ")
