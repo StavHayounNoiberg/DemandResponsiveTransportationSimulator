@@ -25,16 +25,16 @@ class BusAtStop(Event):
             logger.debug("finished")
             return False
         
-        for passenger in self.bus.passengers:
-            if passenger.stop_dest == self.stop:
-                passenger.update_arrival(self.time)
-                self.bus.remove_passenger(passenger)
-                
-        for passenger in self.stop.passengers:
-            if passenger.bus == self.bus:
-                passenger.update_aboard(self.time)
-                self.stop.remove_passenger(passenger)
-                self.bus.add_passenger(passenger)
+        to_remove_from_bus = [passenger for passenger in self.bus.passengers if passenger.stop_dest == self.stop]
+        for passenger in to_remove_from_bus:
+            passenger.update_arrival(self.time)
+            self.bus.remove_passenger(passenger)
+                        
+        to_remove_from_stop = [passenger for passenger in self.stop.passengers if passenger.bus == self.bus]
+        for passenger in to_remove_from_stop:
+            passenger.update_aboard(self.time)
+            self.bus.add_passenger(passenger)
+            self.stop.remove_passenger(passenger)
         
         self.bus.update_passengers_enroute()
         
