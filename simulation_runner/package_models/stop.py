@@ -57,6 +57,14 @@ class Stop:
         except Exception as e:
             logger.error(e)
             return False
+    
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Stop):
+            return False
+        return self.id == value.id
+    
+    def __hash__(self) -> int:
+        return hash(self.id)
 
 
 from FinalProjectSimulator.simulation_runner.package_models.bus import Bus

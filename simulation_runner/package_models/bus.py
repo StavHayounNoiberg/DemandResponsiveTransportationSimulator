@@ -89,6 +89,14 @@ class Bus:
     
     def prepare_passengers_enroute_for_json(self) -> list[dict]:
         return [{"origin": origin.ordinal_number, "destination": destination.ordinal_number if destination is not None else -1, "passengers": passengers} for (origin, destination), passengers in self.passengers_enroute.items()]
+    
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Bus):
+            return False
+        return self.id == value.id
+    
+    def __hash__(self) -> int:
+        return hash(self.id)
 
 
 from FinalProjectSimulator.simulation_runner.package_models.bus_at_stop import BusAtStop
