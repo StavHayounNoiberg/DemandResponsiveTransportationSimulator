@@ -75,13 +75,16 @@ class SimulationManager:
         logger.debug("started")
         logger.info("Saving simulation results")
         
-        self.simulation.set_duration()
-        self.simulation.set_success(True)
-        
         try:
-            save_simulation(self.simulation)
             save_buses(self.simulation.id, self.line_manager.buses)
             save_passengers(self.simulation.id, self.passengers)
+            self.simulation.set_success(True)
+        except:
+            self.simulation.set_success(False)
+        
+        try:
+            self.simulation.set_duration()
+            save_simulation(self.simulation)
         except:
             return False
         
