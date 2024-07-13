@@ -57,3 +57,33 @@ def create_datetimes_random(num_events: int, start_time: datetime, end_time: dat
             events_generated += 1
 
     return event_times
+
+
+def create_report_datetime(arrival_time: datetime):
+    t = np.linspace(-168, 2, 1000)
+    cdf = __customer_arrival_cdf(t)
+    random_value = np.random.rand()
+    report_time = np.interp(random_value, cdf, t)
+    return arrival_time + timedelta(hours=report_time)
+
+
+def __customer_arrival_dist(t):
+    peak_time = -12
+    peak_height = 0.2
+    late_perc = 0.1
+    weekly_increase = 0.5
+
+    main_curve = peak_height * np.exp(-(t - peak_time) ** 2 / (2 * (peak_time / 3) ** 2))
+    main_curve *= (1 + np.maximum(0, t / 168) * weekly_increase)
+    late_curve = late_perc * peak_height * np.exp(-(t - 0.5) ** 2 / (2 * (0.25) ** 2))
+    late_curve[t < 0] = 0
+    pdf = main_curve + late_curve
+    pdf /= np.trapz(pdf, t)
+    return pdf
+
+
+def __customer_arrival_cdf(t):
+    pdf = __customer_arrival_dist(t)
+    cdf = np.cumsum(pdf) * (t[1] - t[0])
+    return cdf
+

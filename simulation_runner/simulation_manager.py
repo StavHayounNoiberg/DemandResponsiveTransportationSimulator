@@ -10,7 +10,7 @@ from FinalProjectSimulator.simulation_runner.line_manager import LineManager
 from FinalProjectSimulator.simulation_runner.package_models.event import Event
 from FinalProjectSimulator.simulation_runner.route_manager import RouteManager
 from FinalProjectSimulator.utilities.datetime_utils import get_day_number, get_datetimes_between
-from FinalProjectSimulator.utilities.distributions import create_datetimes_poisson_distribution
+from FinalProjectSimulator.utilities.distributions import create_datetimes_poisson_distribution, create_report_datetime
 
 
 logger = logging.getLogger(__name__)
@@ -147,8 +147,7 @@ class SimulationManager:
             dst_station = np.random.choice(optional_dsts)
             is_reporting = np.random.choice([True, False], p=[
                                             self.simulation.reporting_rate, 1 - self.simulation.reporting_rate])
-            # TODO: implement reporting time logic
-            report_time = (leave_time - timedelta(hours=1)
+            report_time = (create_report_datetime(leave_time)
                            if is_reporting else leave_time)
             events.append(PassengerRequest(self, report_time, line_id,
                           src_station, dst_station, is_reporting, leave_time))

@@ -4,6 +4,7 @@ from sqlalchemy.types import JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from FinalProjectSimulator.data_repo.db_pool import get_simulation_con
+from FinalProjectSimulator.models.simulation_analysis import SimulationAnalysis
 
 
 logger = logging.getLogger(__name__)
@@ -81,18 +82,27 @@ class PassengerData(Base):
 
 
 class AnalysisData(Base):
-    # TODO: need to chage to the actual measurements
     __tablename__ = 'Analysis'
     analysis_id = Column(String(255), primary_key=True)
-    simulation_ids = Column(JSON)
-    parameters = Column(String(255))
-    value = Column(String(255))
+    line_id = Column(String(50))
+    report_rate = Column(Float)
+    express_rate = Column(Float)
+    avg_travel_time_for_passenger = Column(Float)
+    avg_travel_time_for_bus = Column(Float)
+    avg_waiting_time_for_passenger = Column(Float)
+    rejected_passengers = Column(Integer)
+    passengers_in_assignment = Column(JSON)
     
-    def __init__(self, simulation_id, analysis_id, analysis_type, analysis_data):
-        self.simulation_id = simulation_id
-        self.analysis_id = analysis_id
-        self.analysis_type = analysis_type
-        self.analysis_data = analysis_data        
+    def __init__(self, analysis_data: "SimulationAnalysis"):
+        self.analysis_id = analysis_data.id
+        self.line_id = analysis_data.line_id
+        self.report_rate = analysis_data.report_rate
+        self.express_rate = analysis_data.express_rate
+        self.avg_travel_time_for_passenger = analysis_data.avg_travel_time_for_passenger
+        self.avg_travel_time_for_bus = analysis_data.avg_travel_time_for_bus
+        self.avg_waiting_time_for_passenger = analysis_data.avg_waiting_time_for_passenger
+        self.rejected_passengers = analysis_data.rejected_passengers
+        self.passengers_in_assignment = analysis_data.passengers_in_assignment   
                 
 engine = get_simulation_con()
 Base.metadata.create_all(engine)
@@ -110,6 +120,22 @@ def save_simulation(simulation: "Simulation"):
     except Exception as e:
         session.rollback()
         logger.error(f"Error occurred while committing to the database: {e}")
+        raise
+
+    finally:
+        session.close()
+        
+
+def get_simulation(simulation_id: str):
+    session = Session()
+    try:
+        simulation_data: SimulationData = session.query(SimulationData).filter(SimulationData.simulation_id == simulation_id).first()
+        logger.info("Simulation data executed successfully")
+        return simulation_data
+
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while executing to the database: {e}")
         raise
 
     finally:
@@ -136,7 +162,26 @@ def save_buses(simulation_id, buses: list["Bus"]):
     finally:
         session.close()
         
+def get_buses(simulation_id: str):
+    session = Session()
+    try:
+        buses_data: list[BusData] = []
+        buses_data = session.query(BusData)\
+            .filter(BusData.simulation_id == simulation_id)\
+            .all()
         
+        logger.info("Buses data executed successfully")
+        return buses_data
+    
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while executing to the database: {e}")
+        raise
+    
+    finally:
+        session.close()
+
+
 def save_passengers(simulation_id, passengers: list["Passenger"]):
     session = Session()
     try:
@@ -156,10 +201,84 @@ def save_passengers(simulation_id, passengers: list["Passenger"]):
     finally:
         session.close()
 
+def get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(simulation_id: str, 
+                                                                     assignment_reasons_to_exclude: list[int]):
+    session = Session()
+    try:
+        passengers_data: list[PassengerData] = []
+        passengers_data = session.query(PassengerData)\
+            .filter(PassengerData.simulation_id == simulation_id)\
+            .filter(PassengerData.arrival_time.is_not(None))\
+            .filter(PassengerData.aboard_time.is_not(None))\
+            .filter(PassengerData.assignment_reason.notin_(assignment_reasons_to_exclude))\
+            .all()
+        
+        logger.info("Passengers data executed successfully")
+        return passengers_data
+    
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while executing to the database: {e}")
+        raise
+    
+    finally:
+        session.close()
 
-def save_analysis():
-    # TODO: Fill this
-    pass
+def get_passengers_by_simulation_id_and_assignment_reasons(simulation_id: str, 
+                                                                     assignment_reasons: list[int]):
+    session = Session()
+    try:
+        passengers_data: list[PassengerData] = []
+        passengers_data = session.query(PassengerData)\
+            .filter(PassengerData.simulation_id == simulation_id)\
+            .filter(PassengerData.arrival_time.is_not(None))\
+            .filter(PassengerData.aboard_time.is_not(None))\
+            .filter(PassengerData.assignment_reason.in_(assignment_reasons))\
+            .all()
+        
+        logger.info("Passengers data executed successfully")
+        return passengers_data
+    
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while executing to the database: {e}")
+        raise
+    
+    finally:
+        session.close()
+
+
+def save_analysis(analysis_data: "SimulationAnalysis"):
+    session = Session()
+    try:
+        analysis = AnalysisData(analysis_data)
+        session.add(analysis)
+        session.commit()
+        logger.info("Analysis data committed successfully")
+    
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while committing to the database: {e}")
+        raise
+    
+    finally:
+        session.close()
+        
+
+def get_analysis(analysis_id: str):
+    session = Session()
+    try:
+        analysis_data: AnalysisData = session.query(AnalysisData).filter(AnalysisData.analysis_id == analysis_id).first()
+        logger.info("Analysis data executed successfully")
+        return analysis_data
+    
+    except Exception as e:
+        session.rollback()
+        logger.error(f"Error occurred while executing to the database: {e}")
+        raise
+    
+    finally:
+        session.close()
 
 
 from FinalProjectSimulator.models.simulation import Simulation

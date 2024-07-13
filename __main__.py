@@ -5,7 +5,7 @@ import uuid
 
 
 def main():
-    # Get parameters sent from the command line (start_time, end_time, express_rate, reporting_rate, line_ids)
+    # Get parameters sent from the command line (start_time, end_time, express_rate, reporting_rate, iterations, line_ids)
     if len(sys.argv) >= 7:
         start_time = sys.argv[1]
         end_time = sys.argv[2]
@@ -44,7 +44,7 @@ def main():
         process.join()
 
     # Start analyzer for all simulations
-    simulation_ids = [id for _, id in processes_and_ids]
+    simulation_ids = [f"{id}/{i}" for i in range(int(iterations)) for _, id in processes_and_ids]
     analyzer_command = [
         sys.executable,
         "-m",
@@ -60,7 +60,7 @@ def main():
 
 def get_user_input():
     # TODO: Delete this hard coded parameters
-    return "23-06-2024.00:00", "30-06-2024.03:00", "0.2", "0.5", "4", ["10010-3-#"]
+    return "29-06-2024.00:00", "30-06-2024.03:00", "0.0", "0.0", "4", ["10010-3-#"]
     start_datetime = input("Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
     end_datetime = input("Enter the end datetime (format: DD-MM-YYYY.HH:MM): ")
     express_rate = input("Enter the express rate: ")
