@@ -44,14 +44,14 @@ def main():
         process.join()
 
     # Start analyzer for all simulations
-    simulation_ids = [f"{id}/{i}" for i in range(int(iterations)) for _, id in processes_and_ids]
+    simulation_ids = [id for _, id in processes_and_ids]
     analyzer_command = [
         sys.executable,
         "-m",
         "FinalProjectSimulator.simulation_analyzer",
     ]
     analyzer_command.extend(simulation_ids)
-    
+
     process = multiprocessing.Process(
         target=subprocess.run, args=(analyzer_command,))
     process.start()
@@ -59,8 +59,7 @@ def main():
 
 
 def get_user_input():
-    # TODO: Delete this hard coded parameters
-    return "23-06-2024.00:00", "30-06-2024.03:00", "0.15", "0.15", "32", ["22064-1-#"]
+    # return "23-06-2024.00:00", "30-06-2024.03:00", "0.15", "0.15", "8", ["22064-1-#"]
     start_datetime = input("Enter the start datetime (format: DD-MM-YYYY.HH:MM): ")
     end_datetime = input("Enter the end datetime (format: DD-MM-YYYY.HH:MM): ")
     express_rate = input("Enter the express rate: ")

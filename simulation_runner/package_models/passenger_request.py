@@ -71,8 +71,10 @@ class PassengerRequest(Event):
                             next_express_bus.add_stop(passenger.stop_dest)
                             passenger.update_bus(next_express_bus, AssignmentReason.EXPRESS)
                         else:  # should not happen (logically)
-                            raise Exception("Missing case! passenger reported before next express bus arrives to the source stop," +
+                            logger.error("Missing case! passenger reported before next express bus arrives to the source stop," +
                                             " earliest bus is of type express, but the earliest bus is not the next express bus")
+                            passenger.update_bus(None, AssignmentReason.NO_BUS)
+                            return False
                     else:  # if the earliest bus is an ordinary bus
                         passenger.update_bus(earliest_bus, AssignmentReason.ORDINARY_IS_FASTER)
                 else:  # if reported late
@@ -89,7 +91,9 @@ class PassengerRequest(Event):
                             passenger.update_bus(earliest_bus, AssignmentReason.LATE_REPORT)
             else:  # if there is no express bus in future
                 if type(earliest_bus) is ExpressBus:
-                    raise Exception("Missing case! no next_express_bus but the earliest_bus is of type ExpressBus")
+                    logger.error("Missing case! no next_express_bus but the earliest_bus is of type ExpressBus")
+                    passenger.update_bus(None, AssignmentReason.NO_BUS)
+                    return False
                 passenger.update_bus(earliest_bus, AssignmentReason.ORDINARY_IS_FASTER)
                 
         else: # if not reporting
