@@ -94,9 +94,9 @@ def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", it
 
     # Calculate sum of each metric across all simulations
     for iteration_id in iterations_ids:
-        analysis_data.avg_travel_time_for_passenger += calculate_avg_travel_time_for_passenger(iteration_id)
-        analysis_data.avg_travel_time_for_bus += calculate_avg_travel_time_for_bus(iteration_id)
-        analysis_data.avg_waiting_time_for_passenger += calculate_avg_waiting_time_for_passenger(iteration_id)
+        analysis_data.avg_passenger_travel_time += calculate_avg_travel_time_for_passenger(iteration_id)
+        analysis_data.avg_bus_travel_time += calculate_avg_travel_time_for_bus(iteration_id)
+        analysis_data.avg_passenger_waiting_time += calculate_avg_waiting_time_for_passenger(iteration_id)
         analysis_data.rejected_passengers += calculate_rejected_passengers_rate(iteration_id)
 
         for assignment, value in calculate_dic_passengers_per_assignment(iteration_id).items():
@@ -104,9 +104,9 @@ def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", it
 
     # Calculate averages (excluding the average passengers dictionary)
     logger.info("Calculating averages after all iterations data created")
-    analysis_data.avg_travel_time_for_passenger = analysis_data.avg_travel_time_for_passenger / len(iterations_ids)
-    analysis_data.avg_travel_time_for_bus = analysis_data.avg_travel_time_for_bus / len(iterations_ids)
-    analysis_data.avg_waiting_time_for_passenger = analysis_data.avg_waiting_time_for_passenger / len(iterations_ids)
+    analysis_data.avg_passenger_travel_time = analysis_data.avg_passenger_travel_time / len(iterations_ids)
+    analysis_data.avg_bus_travel_time = analysis_data.avg_bus_travel_time / len(iterations_ids)
+    analysis_data.avg_passenger_waiting_time = analysis_data.avg_passenger_waiting_time / len(iterations_ids)
     analysis_data.rejected_passengers = analysis_data.rejected_passengers / len(iterations_ids)
 
     for assignment in analysis_data.passengers_in_assignment.keys():
@@ -123,9 +123,9 @@ def normalize_metrics(analysis_data: "SimulationAnalysis"):
             analysis_data.id = analysis_data.line_id
         return
 
-    analysis_data.avg_travel_time_for_passenger = analysis_data.avg_travel_time_for_passenger / zero_state_analysis_data.avg_travel_time_for_passenger
-    analysis_data.avg_travel_time_for_bus = analysis_data.avg_travel_time_for_bus / zero_state_analysis_data.avg_travel_time_for_bus
-    analysis_data.avg_waiting_time_for_passenger = analysis_data.avg_waiting_time_for_passenger / zero_state_analysis_data.avg_waiting_time_for_passenger
+    analysis_data.avg_passenger_travel_time_percent = analysis_data.avg_passenger_travel_time / zero_state_analysis_data.avg_passenger_travel_time
+    analysis_data.avg_bus_travel_time_percent = analysis_data.avg_bus_travel_time / zero_state_analysis_data.avg_bus_travel_time
+    analysis_data.avg_passenger_waiting_time_percent = analysis_data.avg_passenger_waiting_time / zero_state_analysis_data.avg_passenger_waiting_time
 
 
 def calculate_report_rate(iteration_ids: list[str]):

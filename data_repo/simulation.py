@@ -88,9 +88,12 @@ class AnalysisData(Base):
     line_id = Column(String(50))
     report_rate = Column(Float)
     express_rate = Column(Float)
-    avg_travel_time_for_passenger = Column(Float)
-    avg_travel_time_for_bus = Column(Float)
-    avg_waiting_time_for_passenger = Column(Float)
+    avg_passenger_travel_time = Column(Float)
+    avg_passenger_travel_time_percent = Column(Float)
+    avg_bus_travel_time = Column(Float)
+    avg_bus_travel_time_percent = Column(Float)
+    avg_passenger_waiting_time = Column(Float)
+    avg_passenger_waiting_time_percent = Column(Float)
     rejected_passengers = Column(Integer)
     passengers_in_assignment = Column(JSON)
 
@@ -99,9 +102,12 @@ class AnalysisData(Base):
         self.line_id = analysis_data.line_id
         self.report_rate = analysis_data.report_rate
         self.express_rate = analysis_data.express_rate
-        self.avg_travel_time_for_passenger = analysis_data.avg_travel_time_for_passenger
-        self.avg_travel_time_for_bus = analysis_data.avg_travel_time_for_bus
-        self.avg_waiting_time_for_passenger = analysis_data.avg_waiting_time_for_passenger
+        self.avg_passenger_travel_time = analysis_data.avg_passenger_travel_time
+        self.avg_passenger_travel_time_percent = analysis_data.avg_passenger_travel_time_percent
+        self.avg_bus_travel_time = analysis_data.avg_bus_travel_time
+        self.avg_bus_travel_time_percent = analysis_data.avg_bus_travel_time_percent
+        self.avg_passenger_waiting_time = analysis_data.avg_passenger_waiting_time
+        self.avg_passenger_waiting_time_percent = analysis_data.avg_passenger_waiting_time_percent
         self.rejected_passengers = analysis_data.rejected_passengers
         self.passengers_in_assignment = analysis_data.passengers_in_assignment
 
