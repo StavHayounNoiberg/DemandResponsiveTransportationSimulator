@@ -117,7 +117,6 @@ def normalize_metrics(analysis_data: "SimulationAnalysis"):
     analysis_data.avg_travel_time_for_passenger = analysis_data.avg_travel_time_for_passenger / zero_state_analysis_data.avg_travel_time_for_passenger
     analysis_data.avg_travel_time_for_bus = analysis_data.avg_travel_time_for_bus / zero_state_analysis_data.avg_travel_time_for_bus
     analysis_data.avg_waiting_time_for_passenger = analysis_data.avg_waiting_time_for_passenger / zero_state_analysis_data.avg_waiting_time_for_passenger
-    analysis_data.rejected_passengers = analysis_data.rejected_passengers / zero_state_analysis_data.rejected_passengers
 
     
 def calculate_report_rate(iteration_ids: list[str]):
