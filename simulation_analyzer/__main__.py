@@ -16,9 +16,10 @@ setup_logging(log_dir, log_level=10)  # DEBUG level (10)
 logger = logging.getLogger(__name__)
 
 
-def calculate_avg_travel_time_for_passenger(simulation_id: str):
+def calculate_avg_travel_time_for_passenger(iteration_id: str):
+    logger.info(f"Calculating average travel time for passengers in simulation {iteration_id}")
     passengers_data: list[PassengerData] = []
-    passengers_data = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(simulation_id, [8])
+    passengers_data = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(iteration_id, [8])
     avg_travel_time_for_passenger = timedelta(seconds=0)
     for passenger in passengers_data:
         avg_travel_time_for_passenger += (passenger.arrival_time - passenger.aboard_time)
@@ -30,12 +31,13 @@ def calculate_avg_travel_time_for_passenger(simulation_id: str):
     return avg_travel_time_for_passenger
 
 
-def calculate_avg_waiting_time_for_passenger(simulation_id: str):
+def calculate_avg_waiting_time_for_passenger(iteration_id: str):
+    logger.info(f"Calculating average waiting time for passengers in simulation {iteration_id}")
     order_in_advance_passengers_data: list[PassengerData] = []
     other_passengers_data: list[PassengerData] = []
     # passengers who ordered in advance have waiting time = 0 
-    order_in_advance_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(simulation_id, [2, 3])
-    other_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(simulation_id, [2, 3, 8])
+    order_in_advance_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(iteration_id, [2, 3])
+    other_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(iteration_id, [2, 3, 8])
     avg_waiting_time_for_passenger = timedelta(seconds=0)
     for passenger in other_passengers_data:
         avg_waiting_time_for_passenger += (passenger.aboard_time - passenger.leaving_time)
@@ -47,9 +49,10 @@ def calculate_avg_waiting_time_for_passenger(simulation_id: str):
     return avg_waiting_time_for_passenger
 
 
-def calculate_avg_travel_time_for_bus(simulation_id: str):
+def calculate_avg_travel_time_for_bus(iteration_id: str):
+    logger.info(f"Calculating average travel time for buses in simulation {iteration_id}")
     buses_data: list[BusData] = []
-    buses_data = get_buses(simulation_id)
+    buses_data = get_buses(iteration_id)
     avg_travel_time_for_bus = timedelta(seconds=0)
     for bus in buses_data:
         avg_travel_time_for_bus += (bus.final_dest_arrival_time - bus.leave_time)
@@ -61,27 +64,31 @@ def calculate_avg_travel_time_for_bus(simulation_id: str):
     return avg_travel_time_for_bus
 
 
-def calculate_rejected_passengers_rate(simulation_id: str):
+def calculate_rejected_passengers_rate(iteration_id: str):
+    logger.info(f"Calculating rejected passengers rate in simulation {iteration_id}")
     rejected_passengers_data: list[PassengerData] = []
     all_passengers: list[PassengerData] = []
-    rejected_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(simulation_id, [1, 6, 7])
-    all_passengers = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(simulation_id, [8])
+    rejected_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(iteration_id, [1, 6, 7])
+    all_passengers = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(iteration_id, [8])
 
-    return len(rejected_passengers_data) / len(all_passengers)
+    return len(rejected_passengers_data) / len(all_passengers) if len(all_passengers) != 0 else 0
 
 
-def calculate_dic_passengers_per_assignment(simulation_id : str):
+def calculate_dic_passengers_per_assignment(iteration_id : str):
+    logger.info(f"Calculating passengers per assignment in simulation {iteration_id}")
     passengers_dic = {}
     passengers_data: list[PassengerData] = []
     for i in range(8):
-        passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(simulation_id, [i])
+        passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(iteration_id, [i])
         passengers_dic[i] = len(passengers_data)
     
     return passengers_dic
 
 
 def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", iterations_ids: list[str]):
-    #create the average passengers dic
+    logger.info("Calculating averages across all iterations")
+    
+    # Create the passenger assingments dictionary
     for i in range(8):
         analysis_data.passengers_in_assignment[i] = 0.0
 
@@ -96,6 +103,7 @@ def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", it
             analysis_data.passengers_in_assignment[assignment] += value
 
     # Calculate averages (excluding the average passengers dictionary)
+    logger.info("Calculating averages after all iterations data created")
     analysis_data.avg_travel_time_for_passenger = analysis_data.avg_travel_time_for_passenger / len(iterations_ids)
     analysis_data.avg_travel_time_for_bus = analysis_data.avg_travel_time_for_bus / len(iterations_ids)
     analysis_data.avg_waiting_time_for_passenger = analysis_data.avg_waiting_time_for_passenger / len(iterations_ids)
@@ -108,6 +116,7 @@ def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", it
     
     
 def normalize_metrics(analysis_data: "SimulationAnalysis"):
+    logger.info("Normalizing metrics with zero state")
     zero_state_analysis_data = get_simulation(analysis_data.line_id)
     if zero_state_analysis_data is None:
         if analysis_data.report_rate == 0.0 and analysis_data.express_rate == 0.0:
@@ -120,6 +129,7 @@ def normalize_metrics(analysis_data: "SimulationAnalysis"):
 
     
 def calculate_report_rate(iteration_ids: list[str]):
+    logger.info("Calculating general report rate")
     report_rate = 0.0
     for iteration_id in iteration_ids:
         report_passengers = 0
@@ -130,12 +140,13 @@ def calculate_report_rate(iteration_ids: list[str]):
             if passenger.reporting_time != passenger.leaving_time:
                 report_passengers += 1
                 
-        report_rate += report_passengers / all_passengers
+        report_rate += report_passengers / all_passengers if all_passengers != 0 else 0
 
     return report_rate / len(iteration_ids)    
     
 
 def calculate_express_rate(iteration_ids: list[str]):
+    logger.info("Calculating general express rate")
     express_rate = 0.0
     for iteration_id in iteration_ids:
         express_buses = 0
