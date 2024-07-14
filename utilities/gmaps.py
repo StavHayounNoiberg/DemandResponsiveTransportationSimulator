@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
 
 # Initialize the Google Maps client
-gmaps = googlemaps.Client(key='AIzaSyBh_8NtC_OKUtV381xzxxs3A6NmJie2IN8')
+gmaps = googlemaps.Client(key=API_KEY)
 
 
-def get_route_timedeltas(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[timedelta]:
+def __get_route_timedeltas(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[timedelta]:
 
     timedeltas: list[timedelta] = [timedelta(seconds=0)]
 
@@ -62,15 +62,50 @@ def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="
     datetimes: list[datetime] = []
     last_time = leave_time
     for i in range(0, len(waypoints), 25):
-        timedeltas = get_route_timedeltas(last_time, waypoints[i:i+25], mode)
+        segment_waypoints = []
+        if i == 0:
+            segment_waypoints = waypoints[i:i+25]
+        else:
+            segment_waypoints = waypoints[i-1:i+25]
+        timedeltas = __get_route_timedeltas(last_time, segment_waypoints, mode)
         if timedeltas is None:
             return None
+        
+        if i > 0:
+            timedeltas = timedeltas[1:]
         datetimes.extend([last_time + delta for delta in timedeltas])
         last_time = datetimes[-1]
     
-    # timedeltas = get_route_timedeltas(leave_time, waypoints, mode)
-    # if timedeltas is None:
-    #     return None
-
-    # datetimes = [leave_time + delta for delta in timedeltas]
     return datetimes
+
+
+def get_route_timedeltas(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[timedelta]:
+    if len(waypoints) < 2:
+        logger.error("Not enough waypoints provided")
+        return None
+
+    timedeltas: list[timedelta] = []
+    last_time = leave_time
+
+    for i in range(0, len(waypoints), 25):
+        segment_waypoints = []
+        if i == 0:
+            segment_waypoints = waypoints[i:i+25]
+        else:
+            segment_waypoints = waypoints[i-1:i+25]
+        route_timedeltas = __get_route_timedeltas(last_time, segment_waypoints, mode)
+        if route_timedeltas is None:
+            return None
+        
+        last_time += route_timedeltas[-1]
+        if i > 0:
+            route_timedeltas = [time + timedeltas[-1] for time in route_timedeltas[1:]]
+        timedeltas.extend(route_timedeltas)        
+    
+    # Compute the differences between consecutive stops
+    timedeltas_between_stops = [timedeltas[0]]
+    for j in range(1, len(timedeltas)):
+        timedeltas_between_stops.append(timedeltas[j] - timedeltas[j-1])
+
+    return timedeltas_between_stops
+

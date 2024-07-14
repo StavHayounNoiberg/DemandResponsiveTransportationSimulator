@@ -31,19 +31,31 @@ class RouteManager:
         logger.debug("finished")
         return self.stops
 
+    # TODO: Bring this back if needed
+    # def create_route(self, bus: Bus) -> list[tuple[Stop, datetime]]:
+    #     logger.debug("started")
+    #     logger.info("Creating route for bus %d", bus.id)
+
+    #     stop_codes_and_times = get_stop_codes_and_arrival_times(bus.id)        
+    #     route = self.__create_route_as_timedeltas(stop_codes_and_times)
+    #     route = self.__convert_route_to_datetimes(bus.leave_time, route)
+        
+    #     if len(route) == 0:
+    #         logger.warning(f"Route for bus with trip id {bus.id} is empty. Will create based on general route")
+    #         if self.general_route is None:
+    #             self.__create_general_route()
+    #         route = self.__convert_route_to_datetimes(bus.leave_time, self.general_route)        
+
+    #     logger.debug("finished")
+    #     return route
+    
     def create_route(self, bus: Bus) -> list[tuple[Stop, datetime]]:
         logger.debug("started")
         logger.info("Creating route for bus %d", bus.id)
-
-        stop_codes_and_times = get_stop_codes_and_arrival_times(bus.id)        
-        route = self.__create_route_as_timedeltas(stop_codes_and_times)
-        route = self.__convert_route_to_datetimes(bus.leave_time, route)
         
-        if len(route) == 0:
-            logger.warning(f"Route for bus with trip id {bus.id} is empty. Will create based on general route")
-            if self.general_route is None:
-                self.__create_general_route()
-            route = self.__convert_route_to_datetimes(bus.leave_time, self.general_route)        
+        if self.general_route is None:
+            self.__create_general_route()
+        route = self.__convert_route_to_datetimes(bus.leave_time, self.general_route)        
 
         logger.debug("finished")
         return route
@@ -112,48 +124,60 @@ class RouteManager:
                 earliest_bus = bus
 
         return earliest_bus
+
+    # TODO: Bring this back if needed        
+    # def __create_general_route(self) -> list[tuple[Stop, timedelta]]:
+    #     logger.debug("started")
+    #     logger.info("Creating general route for line %s", self.simulation.line_id)
         
+    #     trip_ids = get_trip_ids_and_departure_times(self.simulation.line_id, self.simulation.start_time)
+    #     for trip_id in trip_ids["TripId"]:
+    #         stops_and_arrival_times = get_stop_codes_and_arrival_times(trip_id)
+    #         if stops_and_arrival_times.empty or stops_and_arrival_times.shape[0] == 0:
+    #             continue
+    #         general_route = self.__create_route_as_timedeltas(stops_and_arrival_times)
+    #         if len(general_route) > 0:
+    #             self.general_route = general_route
+    #             break
+        
+    #     logger.debug("finished")
+    #     return general_route
+    
+    # def __create_route_as_timedeltas(self, stop_codes_and_times) -> list[tuple[Stop, timedelta]]:
+    #     logger.debug("started")
+    #     route: list[tuple[Stop, timedelta]] = []
+        
+    #     last_arrival_time = None
+    #     for stop_code, arrival_time in stop_codes_and_times.itertuples(index=False):
+    #         if last_arrival_time is None: # for first iteration
+    #             last_arrival_time = arrival_time
+                
+    #         stop = next(
+    #             (stop for stop in self.stops if stop.id == stop_code), None)
+    #         if stop is None:
+    #             logger.error(
+    #                 "Stop with code %s not found in simulation stops", stop_code)
+    #             return []
+            
+    #         time_between_stops = arrival_time - last_arrival_time
+    #         route.append((stop, time_between_stops))
+    #         last_arrival_time = arrival_time
+            
+    #     route.sort(key=lambda x: x[0].ordinal_number)
+        
+    #     logger.debug("finished")
+    #     return route
+    
     def __create_general_route(self) -> list[tuple[Stop, timedelta]]:
         logger.debug("started")
         logger.info("Creating general route for line %s", self.simulation.line_id)
         
-        trip_ids = get_trip_ids_and_departure_times(self.simulation.line_id, self.simulation.start_time)
-        for trip_id in trip_ids["TripId"]:
-            stops_and_arrival_times = get_stop_codes_and_arrival_times(trip_id)
-            if stops_and_arrival_times.empty or stops_and_arrival_times.shape[0] == 0:
-                continue
-            general_route = self.__create_route_as_timedeltas(stops_and_arrival_times)
-            if len(general_route) > 0:
-                self.general_route = general_route
-                break
-        
-        logger.debug("finished")
+        stops_locations = [stop.location for stop in self.stops]
+        general_datetime = self.simulation.start_time.replace(hour=8, minute=0, second=0, microsecond=0)
+        stops_datetimes = get_route_timedeltas(general_datetime, stops_locations)
+        general_route = list(zip(self.stops, stops_datetimes))
+        self.general_route = general_route
         return general_route
-    
-    def __create_route_as_timedeltas(self, stop_codes_and_times) -> list[tuple[Stop, timedelta]]:
-        logger.debug("started")
-        route: list[tuple[Stop, timedelta]] = []
-        
-        last_arrival_time = None
-        for stop_code, arrival_time in stop_codes_and_times.itertuples(index=False):
-            if last_arrival_time is None: # for first iteration
-                last_arrival_time = arrival_time
-                
-            stop = next(
-                (stop for stop in self.stops if stop.id == stop_code), None)
-            if stop is None:
-                logger.error(
-                    "Stop with code %s not found in simulation stops", stop_code)
-                return []
-            
-            time_between_stops = arrival_time - last_arrival_time
-            route.append((stop, time_between_stops))
-            last_arrival_time = arrival_time
-            
-        route.sort(key=lambda x: x[0].ordinal_number)
-        
-        logger.debug("finished")
-        return route
         
     def __convert_route_to_datetimes(self, leave_time: datetime, route: list[tuple[Stop, timedelta]]) -> list[tuple[Stop, datetime]]:
         logger.debug("started")
