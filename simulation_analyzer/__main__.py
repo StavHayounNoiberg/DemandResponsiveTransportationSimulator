@@ -97,17 +97,19 @@ def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", it
         analysis_data.avg_passenger_travel_time += calculate_avg_travel_time_for_passenger(iteration_id)
         analysis_data.avg_bus_travel_time += calculate_avg_travel_time_for_bus(iteration_id)
         analysis_data.avg_passenger_waiting_time += calculate_avg_waiting_time_for_passenger(iteration_id)
-        analysis_data.rejected_passengers += calculate_rejected_passengers_rate(iteration_id)
 
         for assignment, value in calculate_dic_passengers_per_assignment(iteration_id).items():
             analysis_data.passengers_in_assignment[assignment] += value
-
+            
+    analysis_data.rejected_passengers = analysis_data.passengers_in_assignment[1] + analysis_data.passengers_in_assignment[6] + analysis_data.passengers_in_assignment[7]
+    total_passengers = sum(analysis_data.passengers_in_assignment.values())
+    analysis_data.rejected_passengers /= total_passengers if total_passengers > 0 else 0
+    
     # Calculate averages (excluding the average passengers dictionary)
     logger.info("Calculating averages after all iterations data created")
-    analysis_data.avg_passenger_travel_time = analysis_data.avg_passenger_travel_time / len(iterations_ids)
-    analysis_data.avg_bus_travel_time = analysis_data.avg_bus_travel_time / len(iterations_ids)
-    analysis_data.avg_passenger_waiting_time = analysis_data.avg_passenger_waiting_time / len(iterations_ids)
-    analysis_data.rejected_passengers = analysis_data.rejected_passengers / len(iterations_ids)
+    analysis_data.avg_passenger_travel_time /= len(iterations_ids)
+    analysis_data.avg_bus_travel_time /= len(iterations_ids)
+    analysis_data.avg_passenger_waiting_time /= len(iterations_ids)
 
     for assignment in analysis_data.passengers_in_assignment.keys():
         analysis_data.passengers_in_assignment[assignment] /= len(iterations_ids)
@@ -164,8 +166,8 @@ def calculate_express_rate(iteration_ids: list[str]):
 
 if __name__ == "__main__":
     try:
-        logger.info("Analyzer starting")
         analysis_id = str(uuid.uuid4())
+        logger.info("Starting analysis: %s", analysis_id)
 
         # get all the parameters from the command line arguments
         simulation_ids = sys.argv[1:]
