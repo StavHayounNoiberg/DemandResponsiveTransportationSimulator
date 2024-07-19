@@ -85,6 +85,7 @@ class PassengerData(Base):
 class AnalysisData(Base):
     __tablename__ = 'Analysis'
     analysis_id = Column(String(255), primary_key=True)
+    simulation_ids = Column(JSON)
     line_id = Column(String(50))
     report_rate = Column(Float)
     express_rate = Column(Float)
@@ -99,6 +100,7 @@ class AnalysisData(Base):
 
     def __init__(self, analysis_data: "SimulationAnalysis"):
         self.analysis_id = analysis_data.id
+        self.simulation_ids = analysis_data.simulations_ids
         self.line_id = analysis_data.line_id
         self.report_rate = analysis_data.report_rate
         self.express_rate = analysis_data.express_rate

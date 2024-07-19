@@ -1,6 +1,7 @@
 class SimulationAnalysis:
     def __init__(self,
                  id: str,
+                 simulations_ids: list[str],
                  line_id: str,
                  report_rate: float = 0.0,
                  express_rate: float = 0.0,
@@ -13,6 +14,7 @@ class SimulationAnalysis:
                  rejected_passengers: float = 0.0,
                  passengers_in_assignment: dict = {}):
         self.id = id
+        self.simulations_ids = simulations_ids
         self.line_id = line_id
         self.report_rate = report_rate
         self.express_rate = express_rate
