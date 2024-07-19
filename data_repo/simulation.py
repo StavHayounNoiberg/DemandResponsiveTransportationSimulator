@@ -94,7 +94,7 @@ class AnalysisData(Base):
     avg_bus_travel_time_percent = Column(Float)
     avg_passenger_waiting_time = Column(Float)
     avg_passenger_waiting_time_percent = Column(Float)
-    rejected_passengers = Column(Integer)
+    rejected_passengers = Column(Float)
     passengers_in_assignment = Column(JSON)
 
     def __init__(self, analysis_data: "SimulationAnalysis"):
