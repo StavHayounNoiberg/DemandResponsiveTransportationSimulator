@@ -33,18 +33,19 @@ def calculate_avg_travel_time_for_passenger(iteration_id: str):
 
 def calculate_avg_waiting_time_for_passenger(iteration_id: str):
     logger.info(f"Calculating average waiting time for passengers in simulation {iteration_id}")
-    order_in_advance_passengers_data: list[PassengerData] = []
-    other_passengers_data: list[PassengerData] = []
+    # order_in_advance_passengers_data: list[PassengerData] = []
+    passengers_data: list[PassengerData] = []
     # passengers who ordered in advance have waiting time = 0
-    order_in_advance_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(iteration_id, [2, 3])
-    other_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(iteration_id, [2, 3, 8])
+    # order_in_advance_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(iteration_id, [2, 3])
+    passengers_data = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(iteration_id, [8])
     avg_waiting_time_for_passenger = timedelta(seconds=0)
-    for passenger in other_passengers_data:
+    for passenger in passengers_data:
         avg_waiting_time_for_passenger += (passenger.aboard_time - passenger.leaving_time)
 
     if avg_waiting_time_for_passenger != timedelta(seconds=0):
         avg_waiting_time_for_passenger = avg_waiting_time_for_passenger.total_seconds() / 60
-        avg_waiting_time_for_passenger = avg_waiting_time_for_passenger / (len(other_passengers_data) + len(order_in_advance_passengers_data))
+        # avg_waiting_time_for_passenger = avg_waiting_time_for_passenger / (len(other_passengers_data) + len(order_in_advance_passengers_data))
+        avg_waiting_time_for_passenger /= (len(passengers_data))
 
     return avg_waiting_time_for_passenger
 
@@ -179,7 +180,7 @@ if __name__ == "__main__":
         simulation_data = get_simulation(iteration_ids[0])
         report_rate = calculate_report_rate(iteration_ids)
         express_rate = calculate_express_rate(iteration_ids)
-        analysis_data = SimulationAnalysis(analysis_id, simulation_data.line_id, report_rate, express_rate)
+        analysis_data = SimulationAnalysis(analysis_id, simulation_ids, simulation_data.line_id, report_rate, express_rate)
 
         # for each simulation id, calculate all measures and create averages for each data type
         calculate_averages_across_iterations(analysis_data, iteration_ids)
