@@ -181,7 +181,9 @@ if __name__ == "__main__":
             raise ValueError("No simulation ids were provided")
 
         iteration_ids = get_iteration_ids(simulation_ids)
-
+        if len(iteration_ids) == 0:
+            raise ValueError("No iteration ids were found")
+        
         simulation_data = get_simulation(iteration_ids[0])
         report_rate = calculate_report_rate(iteration_ids)
         express_rate = calculate_express_rate(iteration_ids)
