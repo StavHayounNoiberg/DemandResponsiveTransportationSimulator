@@ -17,13 +17,12 @@ gmaps_clients = [googlemaps.Client(key=key) for key in API_KEYS]
 
 
 def __get_route_timedeltas(waypoints: list[tuple[float, float]], mode = "driving", leave_time: datetime = datetime.min) -> list[timedelta]:
+    start_coords = waypoints[0]
+    end_coords = waypoints[-1]
+    waypoints = waypoints[1:-1]
+        
     for gmaps in gmaps_clients:
         timedeltas: list[timedelta] = [timedelta(seconds=0)]
-
-        start_coords = waypoints[0]
-        end_coords = waypoints[-1]
-        waypoints = waypoints[1:-1]
-
         try:
             directions_result = None
             
