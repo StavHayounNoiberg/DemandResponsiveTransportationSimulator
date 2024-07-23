@@ -27,24 +27,20 @@ class SimulationManager:
     def create_events(self) -> list[Event]:
         logger.debug("started")
         logger.info("Creating simulation events")
-        try:
-            self.route_manager.create_stops()
-            self.line_manager.create_buses()
+        self.route_manager.create_stops()
+        self.line_manager.create_buses()
 
-            # call create_events for each bus and append events to the queue
-            for bus in self.line_manager.buses:
-                self.queue.extend(bus.create_events())
+        # call create_events for each bus and append events to the queue
+        for bus in self.line_manager.buses:
+            self.queue.extend(bus.create_events())
 
-            # call create_passengers_events and append events to the queue
-            self.queue.extend(self.__create_passengers_events())
+        # call create_passengers_events and append events to the queue
+        self.queue.extend(self.__create_passengers_events())
 
-            # turn the queue into a heap
-            heapq.heapify(self.queue)
-            logger.debug("finished")
-            return self.queue
-        except Exception as e:
-            logger.error(e)
-            return []
+        # turn the queue into a heap
+        heapq.heapify(self.queue)
+        logger.debug("finished")
+        return self.queue
 
     def peek_next_event(self) -> Event:
         if not self.queue:
@@ -62,10 +58,10 @@ class SimulationManager:
             return True
         except TypeError:
             logger.error("Event must be an instance of the Event class")
-            return False
+            raise TypeError("Event must be an instance of the Event class")
         except Exception as e:
             logger.error(e)
-            return False
+            raise e
 
     def add_passenger(self, passenger) -> bool:
         self.passengers.append(passenger)

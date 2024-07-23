@@ -15,7 +15,7 @@ def get_stations_passengers_by_day(line_id: str, day: int) -> pd.DataFrame | Non
             return df
     except Exception as e:
         logger.error(e)
-        return None
+        raise e
 
 
 def get_all_stations(line_id: str) -> pd.DataFrame | None:
@@ -26,7 +26,7 @@ def get_all_stations(line_id: str) -> pd.DataFrame | None:
             return df
     except Exception as e:
         logger.error(e)
-        return None
+        raise e
 
 
 def map_days(day: int) -> str:

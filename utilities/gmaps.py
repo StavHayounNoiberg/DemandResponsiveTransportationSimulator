@@ -6,65 +6,67 @@ from datetime import datetime, timedelta
 logger = logging.getLogger(__name__)
 
 
-# Replace with your own API key
-API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'
+# Change to your API keys
 
-# Initialize the Google Maps client
-gmaps = googlemaps.Client(key=API_KEY)
+API_KEYS = [
+    "key1",
+    "key2"]
+
+# Initialize the Google Maps clients
+gmaps_clients = [googlemaps.Client(key=key) for key in API_KEYS]
 
 
 def __get_route_timedeltas(waypoints: list[tuple[float, float]], mode = "driving", leave_time: datetime = datetime.min) -> list[timedelta]:
-    
-    timedeltas: list[timedelta] = [timedelta(seconds=0)]
+    for gmaps in gmaps_clients:
+        timedeltas: list[timedelta] = [timedelta(seconds=0)]
 
-    start_coords = waypoints[0]
-    end_coords = waypoints[-1]
-    waypoints = waypoints[1:-1]
+        start_coords = waypoints[0]
+        end_coords = waypoints[-1]
+        waypoints = waypoints[1:-1]
 
-    try:
-        directions_result = None
-        
-        if leave_time > datetime.min:
-            departure_time = leave_time
-            if departure_time < datetime.now():
-                diff = datetime.now() - departure_time
-                weeks_to_add = (diff.days // 7) + 1
-                departure_time += timedelta(weeks=weeks_to_add)
-                
-            directions_result = gmaps.directions(start_coords,
-                                                end_coords,
-                                                mode=mode,
-                                                waypoints=waypoints,
-                                                departure_time=departure_time)
-        else:
-            directions_result = gmaps.directions(start_coords,
-                                                end_coords,
-                                                mode=mode,
-                                                waypoints=waypoints)
+        try:
+            directions_result = None
+            
+            if leave_time > datetime.min:
+                departure_time = leave_time
+                if departure_time < datetime.now():
+                    diff = datetime.now() - departure_time
+                    weeks_to_add = (diff.days // 7) + 1
+                    departure_time += timedelta(weeks=weeks_to_add)
+                    
+                directions_result = gmaps.directions(start_coords,
+                                                    end_coords,
+                                                    mode=mode,
+                                                    waypoints=waypoints,
+                                                    departure_time=departure_time)
+            else:
+                directions_result = gmaps.directions(start_coords,
+                                                    end_coords,
+                                                    mode=mode,
+                                                    waypoints=waypoints)
 
-        # Extract and print the route length, duration, and time of arrival at each stop
-        if directions_result:
-            legs = directions_result[0]['legs']
-            total_duration_seconds = 0
+            # Extract and print the route length, duration, and time of arrival at each stop
+            if directions_result:
+                legs = directions_result[0]['legs']
+                total_duration_seconds = 0
 
-            for _, leg in enumerate(legs):
-                total_duration_seconds += leg['duration']['value']
-                timedeltas.append(timedelta(seconds=total_duration_seconds))
-                
-            return timedeltas
+                for _, leg in enumerate(legs):
+                    total_duration_seconds += leg['duration']['value']
+                    timedeltas.append(timedelta(seconds=total_duration_seconds))
+                    
+                return timedeltas
 
-        else:
-            raise Exception("No directions found")
+            else:
+                raise Exception("No directions found")
 
-    except Exception as e:
-        logger.error(e)
-        return None
-
+        except Exception as e:
+            logger.error(e)
+            logger.error("API key %s failed, trying another key", gmaps.key)
 
 def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="driving") -> list[datetime]:
     if len(waypoints) < 2:
         logger.error("Not enough waypoints provided")
-        return None
+        raise ValueError("Not enough waypoints provided")
     
     datetimes: list[datetime] = []
     last_time = leave_time
@@ -89,7 +91,7 @@ def get_route(leave_time: datetime, waypoints: list[tuple[float, float]], mode="
 def get_route_timedeltas(waypoints: list[tuple[float, float]], mode="driving") -> list[timedelta]:
     if len(waypoints) < 2:
         logger.error("Not enough waypoints provided")
-        return None
+        raise ValueError("Not enough waypoints provided")
 
     timedeltas: list[timedelta] = []
 

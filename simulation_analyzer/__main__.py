@@ -23,27 +23,27 @@ def calculate_avg_travel_time_for_passenger(iteration_id: str, passengers: list[
     for passenger in passengers_data:
         avg_travel_time_for_passenger += (passenger.arrival_time - passenger.aboard_time)
 
-    if avg_travel_time_for_passenger != timedelta(seconds=0):
+    if avg_travel_time_for_passenger > timedelta(seconds=0) and len(passengers_data) > 0:
         avg_travel_time_for_passenger = avg_travel_time_for_passenger.total_seconds() / 60
         avg_travel_time_for_passenger = avg_travel_time_for_passenger / (len(passengers_data))
+    else:
+        avg_travel_time_for_passenger = 0.0
 
     return avg_travel_time_for_passenger
 
 
 def calculate_avg_waiting_time_for_passenger(iteration_id: str, passengers: list[PassengerData]):
     logger.info(f"Calculating average waiting time for passengers in simulation {iteration_id}")
-    # order_in_advance_passengers_data: list[PassengerData] = []
-    # passengers who ordered in advance have waiting time = 0
-    # order_in_advance_passengers_data = get_passengers_by_simulation_id_and_assignment_reasons(iteration_id, [2, 3])
-    passengers_data = passengers
+    passengers_data = [p for p in passengers if p.assignment_reason == 0 or p.assignment_reason == 1]
     avg_waiting_time_for_passenger = timedelta(seconds=0)
     for passenger in passengers_data:
         avg_waiting_time_for_passenger += (passenger.aboard_time - passenger.leaving_time)
 
-    if avg_waiting_time_for_passenger != timedelta(seconds=0):
+    if avg_waiting_time_for_passenger > timedelta(seconds=0) and len(passengers) > 0:
         avg_waiting_time_for_passenger = avg_waiting_time_for_passenger.total_seconds() / 60
-        # avg_waiting_time_for_passenger = avg_waiting_time_for_passenger / (len(other_passengers_data) + len(order_in_advance_passengers_data))
-        avg_waiting_time_for_passenger /= (len(passengers_data))
+        avg_waiting_time_for_passenger /= (len(passengers))
+    else:
+        avg_waiting_time_for_passenger = 0.0
 
     return avg_waiting_time_for_passenger
 
@@ -55,9 +55,11 @@ def calculate_avg_travel_time_for_bus(iteration_id: str, buses: list[BusData]):
     for bus in buses_data:
         avg_travel_time_for_bus += (bus.final_dest_arrival_time - bus.leave_time)
 
-    if avg_travel_time_for_bus != timedelta(seconds=0):
+    if avg_travel_time_for_bus > timedelta(seconds=0) and len(buses_data) > 0:
         avg_travel_time_for_bus = avg_travel_time_for_bus.total_seconds() / 60
         avg_travel_time_for_bus = avg_travel_time_for_bus / len(buses_data)
+    else:
+        avg_travel_time_for_bus = 0.0
 
     return avg_travel_time_for_bus
 
@@ -92,7 +94,10 @@ def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", it
     # Calculate sum of each metric across all simulations
     for iteration_id in iterations_ids:
         passengers = get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(iteration_id, [8])
+        passengers = [p for p in passengers if p.arrival_time is not None and p.aboard_time is not None]
+        analysis_data.avg_passengers_count += len(passengers)
         buses = get_buses(iteration_id)
+        analysis_data.avg_bus_count += len(buses)
         analysis_data.avg_passenger_travel_time += calculate_avg_travel_time_for_passenger(iteration_id, passengers)
         analysis_data.avg_bus_travel_time += calculate_avg_travel_time_for_bus(iteration_id, buses)
         analysis_data.avg_passenger_waiting_time += calculate_avg_waiting_time_for_passenger(iteration_id, passengers)
@@ -109,6 +114,8 @@ def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", it
     analysis_data.avg_passenger_travel_time /= len(iterations_ids)
     analysis_data.avg_bus_travel_time /= len(iterations_ids)
     analysis_data.avg_passenger_waiting_time /= len(iterations_ids)
+    analysis_data.avg_passengers_count /= len(iterations_ids)
+    analysis_data.avg_bus_count /= len(iterations_ids)
 
     for assignment in analysis_data.passengers_in_assignment.keys():
         analysis_data.passengers_in_assignment[assignment] /= len(iterations_ids)

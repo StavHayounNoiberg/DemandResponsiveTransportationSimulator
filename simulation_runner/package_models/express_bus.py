@@ -21,7 +21,7 @@ class ExpressBus(Bus):
             return True
         except Exception as e:
             logger.error(e)
-            return False
+            raise e
         
     def set_pending_stops(self, stops: list["Stop"]) -> bool:
         logger.debug("started")
@@ -32,7 +32,7 @@ class ExpressBus(Bus):
             return True
         except Exception as e:
             logger.error(e)
-            return False
+            raise e
 
     def clear_pending_stops(self) -> bool:
         logger.debug("started")
@@ -43,7 +43,7 @@ class ExpressBus(Bus):
             return True
         except Exception as e:
             logger.error(e)
-            return False
+            raise e
 
 
 from FinalProjectSimulator.simulation_runner.package_models.stop import Stop

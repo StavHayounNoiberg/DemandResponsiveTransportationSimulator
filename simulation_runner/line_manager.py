@@ -36,21 +36,21 @@ class LineManager:
                     pending_stops = [stop for stop, _, is_green in bus_stops if is_green]
                     if bus.set_pending_stops(pending_stops) is False:
                         logger.error("Failed to set pending stops for express bus %d", bus.id)
-                        return []
+                        raise RuntimeError(f"Failed to set pending stops for express bus {bus.id}")
                     bus_route = [(stop, time) for stop, time, _ in bus_stops]
                     if bus.update_route(bus_route) is False:
                         logger.error("Failed to update route for express bus %d", self.id)
-                        return []
+                        raise RuntimeError(f"Failed to update route for express bus {self.id}")
                 else:
                     bus = Bus(trip_id, self, departure_time)
                     bus_stops = self.simulation_manager.route_manager.create_route(bus)
                     if bus.update_route(bus_stops) is False:
                         logger.error("Failed to update route for bus %d", bus.id)
-                        return []
+                        raise RuntimeError(f"Failed to update route for bus {bus.id}")
                 
                 if bus.update_last_next_stop() is False:
                     logger.error("Failed to update last and next stop for bus %d", bus.id)
-                    return []
+                    raise RuntimeError(f"Failed to update last and next stop for bus {bus.id}")
 
                 for stop in bus_stops:
                     stop[0].add_bus(bus, stop[1])

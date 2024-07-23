@@ -89,12 +89,11 @@ class AnalysisData(Base):
     line_id = Column(String(50))
     report_rate = Column(Float)
     express_rate = Column(Float)
-    avg_passenger_travel_time = Column(Float)
-    avg_passenger_travel_time_percent = Column(Float)
+    avg_bus_count = Column(Float)
+    avg_passengers_count = Column(Float)
     avg_bus_travel_time = Column(Float)
-    avg_bus_travel_time_percent = Column(Float)
+    avg_passenger_travel_time = Column(Float)
     avg_passenger_waiting_time = Column(Float)
-    avg_passenger_waiting_time_percent = Column(Float)
     rejected_passengers = Column(Float)
     passengers_in_assignment = Column(JSON)
 
@@ -104,12 +103,11 @@ class AnalysisData(Base):
         self.line_id = analysis_data.line_id
         self.report_rate = analysis_data.report_rate
         self.express_rate = analysis_data.express_rate
-        self.avg_passenger_travel_time = analysis_data.avg_passenger_travel_time
-        self.avg_passenger_travel_time_percent = analysis_data.avg_passenger_travel_time_percent
+        self.avg_bus_count = analysis_data.avg_bus_count
+        self.avg_passengers_count = analysis_data.avg_passengers_count
         self.avg_bus_travel_time = analysis_data.avg_bus_travel_time
-        self.avg_bus_travel_time_percent = analysis_data.avg_bus_travel_time_percent
+        self.avg_passenger_travel_time = analysis_data.avg_passenger_travel_time
         self.avg_passenger_waiting_time = analysis_data.avg_passenger_waiting_time
-        self.avg_passenger_waiting_time_percent = analysis_data.avg_passenger_waiting_time_percent
         self.rejected_passengers = analysis_data.rejected_passengers
         self.passengers_in_assignment = analysis_data.passengers_in_assignment
 
@@ -205,7 +203,7 @@ def get_buses(simulation_id: str):
             .filter(BusData.simulation_id == simulation_id)\
             .all()
 
-        logger.info("Buses data executed successfully")
+        logger.info("Found %s buses for simulation %s", len(buses_data), simulation_id)
         return buses_data
 
     except Exception as e:
@@ -249,7 +247,7 @@ def get_passengers_by_simulation_id_and_assignment_reasons_to_exclude(simulation
             .filter(PassengerData.assignment_reason.notin_(assignment_reasons_to_exclude))\
             .all()
 
-        logger.info("Passengers data executed successfully")
+        logger.info("Found %s passengers for simulation %s", len(passengers_data), simulation_id)
         return passengers_data
 
     except Exception as e:
@@ -273,7 +271,7 @@ def get_passengers_by_simulation_id_and_assignment_reasons(simulation_id: str,
             .filter(PassengerData.assignment_reason.in_(assignment_reasons))\
             .all()
 
-        logger.info("Passengers data executed successfully")
+        logger.info("Found %s passengers for simulation %s", len(passengers_data), simulation_id)
         return passengers_data
 
     except Exception as e:

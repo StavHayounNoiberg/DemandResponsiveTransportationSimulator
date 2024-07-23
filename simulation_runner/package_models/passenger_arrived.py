@@ -19,7 +19,7 @@ class PassengerArrived(Event):
         if self.passenger.stop_src.add_passenger(self.passenger) is False:
             logger.error("Failed to add passenger %d to stop %d",
                          self.passenger.id, self.passenger.stop_src.id)
-            return False
+            raise RuntimeError(f"Failed to add passenger {self.passenger.id} to stop {self.passenger.stop_src.id}")
         logger.debug("finished")
         return True
 

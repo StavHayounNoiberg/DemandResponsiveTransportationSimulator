@@ -12,10 +12,11 @@ config.read(config_file)
 def create_engine_from_config(config_section, database):
     return create_engine(
         f"mysql+mysqldb://{config_section['user']}:{config_section['password']}@{config_section['host']}/{database}?charset={config_section['charset']}",
-        pool_size=5,
-        max_overflow=10,
-        pool_timeout=30,
+        pool_size=8,
+        max_overflow=0,
+        pool_timeout=90,
         pool_recycle=1800,
+        pool_pre_ping=True,
     )
 
 

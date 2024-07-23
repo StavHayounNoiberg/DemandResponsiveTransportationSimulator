@@ -32,14 +32,14 @@ def get_stop_location(stop_code: str) -> tuple[float, float] | None:
             num_rows = df.shape[0]
             if num_rows == 0:
                 logger.error("No location found for stop code %s", stop_code)
-                return None
+                raise ValueError("No location found for stop code")
             elif num_rows > 1:
                 logger.warning(
                     "More than one location found for stop code %s", stop_code)
             return df.iloc[0].values
     except Exception as e:
         logger.error(e)
-        return None
+        raise e
 
 
 def get_trip_ids_and_departure_times(full_line_id: str, date: datetime) -> pd.DataFrame | None:
@@ -68,4 +68,4 @@ def get_trip_ids_and_departure_times(full_line_id: str, date: datetime) -> pd.Da
         
     except Exception as e:
         logger.error(e)
-        return None
+        raise e

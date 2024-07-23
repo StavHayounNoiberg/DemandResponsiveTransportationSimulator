@@ -43,7 +43,7 @@ class Bus:
             return True
         except Exception as e:
             logger.error(e)
-            return False
+            raise e
 
     def remove_passenger(self, passenger: "Passenger") -> bool:
         logger.debug("started")
@@ -54,7 +54,7 @@ class Bus:
             return True
         except Exception as e:
             logger.error(e)
-            return False
+            raise e
 
     def update_route(self, route: list[tuple["Stop", datetime]]) -> bool:
         logger.debug("started")
@@ -65,7 +65,7 @@ class Bus:
             return True
         except Exception as e:
             logger.error(e)
-            return False
+            raise e
 
     def update_last_next_stop(self) -> bool:
         logger.debug("started")

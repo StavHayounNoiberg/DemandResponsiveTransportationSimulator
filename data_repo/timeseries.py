@@ -21,7 +21,7 @@ def get_timeseries_data_by_primary_key(
             return df
     except Exception as e:
         logger.error(e)
-        return None
+        raise e
 
 
 def map_days(day: int) -> str:
