@@ -120,20 +120,16 @@ def calculate_averages_across_iterations(analysis_data: "SimulationAnalysis", it
     for assignment in analysis_data.passengers_in_assignment.keys():
         analysis_data.passengers_in_assignment[assignment] /= len(iterations_ids)
 
-    normalize_metrics(analysis_data)
+    check_for_zero_state(analysis_data)
 
 
-def normalize_metrics(analysis_data: "SimulationAnalysis"):
-    logger.info("Normalizing metrics with zero state")
+def check_for_zero_state(analysis_data: "SimulationAnalysis"):
     zero_state_analysis_data = get_analysis(analysis_data.line_id)
     if zero_state_analysis_data is None:
         if analysis_data.report_rate == 0.0 and analysis_data.express_rate == 0.0:
+            logger.info("Transforming analysis data to zero state")
             analysis_data.id = analysis_data.line_id
         return
-
-    analysis_data.avg_passenger_travel_time_percent = analysis_data.avg_passenger_travel_time / zero_state_analysis_data.avg_passenger_travel_time
-    analysis_data.avg_bus_travel_time_percent = analysis_data.avg_bus_travel_time / zero_state_analysis_data.avg_bus_travel_time
-    analysis_data.avg_passenger_waiting_time_percent = analysis_data.avg_passenger_waiting_time / zero_state_analysis_data.avg_passenger_waiting_time
 
 
 def calculate_report_rate(iteration_ids: list[str]):
