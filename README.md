@@ -2,7 +2,9 @@
 Final Project of Industrial Engineering & Computer Science B.Sc at Afeka Academic College of Engineering
 
 ## Overview
-A comprehensive simulation project designed to analyze and simulate various aspects of a transportation system. The project is structured into several modules, each responsible for different functionalities such as data analysis, simulation, and utility functions.
+The Demand Responsive Transportation Simulator is a key component of the project, developed to support decision-making and policy evaluation. The simulator is designed to model a transportation system where bus routes dynamically adapt based on real-time passenger demand. Specifically, the system explores a mixed operational mode where some buses run as "Express" buses, skipping unnecessary stops, while others continue operating on regular schedules.
+
+The simulation generates detailed data on several key factors, including average travel time, wait time, and passenger service rates for each bus line. These metrics enable a comprehensive comparison of different operational policies, helping decision-makers evaluate the most efficient balance between regular and express bus services. By analyzing multiple policies over a short period, the simulator provides insights into the system's potential performance before implementing changes in the field​.
 
 ## Getting Started
 
