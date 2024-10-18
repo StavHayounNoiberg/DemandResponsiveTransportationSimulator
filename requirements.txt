@@ -1,0 +1,6 @@
+pandas==2.2.0
+SQLAlchemy==2.0.29
+numpy==1.26.3
+googlemaps==4.10.0
+mysql-connector-python==8.4.0
+mysqlclient==2.2.4
