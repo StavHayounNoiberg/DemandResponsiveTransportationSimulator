@@ -98,3 +98,9 @@ If the command-line arguments are not provided, the simulator will prompt the us
 The simulator starts a different process for each line provided and runs each iteration on a separate thread.
 The number of threads running in parallel equals the number of CPUs in the system.
 Once the simulation ends, the analysis process starts for all iterations of the given simulation, and the combined results analysis is saved to the database.
+
+## License
+
+This project is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/) license.
+You are free to use this work for personal purposes as long as you give appropriate credit, but you may not use it for commercial purposes without permission.
+
